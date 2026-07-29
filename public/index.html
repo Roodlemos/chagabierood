@@ -272,6 +272,16 @@
       text-transform: uppercase; letter-spacing: .1em;
       color: var(--n500); margin-bottom: .45rem;
     }
+
+    /* ──────────────────────────────────── */
+    /* RSVP RADIOS                          */
+    /* ──────────────────────────────────── */
+    input[name="rsvp-presenca"][value="true"]:checked + .btn-sim {
+      border-color: var(--s500) !important; background: #f0faf0; color: var(--s700) !important;
+    }
+    input[name="rsvp-presenca"][value="false"]:checked + .btn-nao {
+      border-color: #fca5a5 !important; background: #fef2f2; color: #b91c1c !important;
+    }
   </style>
 </head>
 
@@ -347,6 +357,65 @@
     </div>
   </div>
 </header>
+
+<!-- ═══════════ RSVP ═══════════ -->
+<section id="rsvp" style="background:var(--blush);padding:5rem 1.25rem;text-align:center;">
+  <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:24px;padding:3.5rem 2rem;box-shadow:var(--shadow-card);">
+    <p style="font-size:.65rem;font-weight:600;letter-spacing:.25em;text-transform:uppercase;color:var(--g600);margin-bottom:.6rem;">Confirme sua Presença</p>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,6vw,2.8rem);font-weight:400;color:var(--s800);margin-bottom:1rem;line-height:1.1;">
+      Você vai celebrar conosco?
+    </h2>
+    <p style="font-size:.85rem;color:var(--n400);margin-bottom:2rem;line-height:1.6;font-weight:300;">
+      Por favor, confirme sua presença até o dia 20 de Julho para que possamos preparar tudo com muito carinho.
+    </p>
+
+    <form id="form-rsvp" novalidate style="text-align:left;display:flex;flex-direction:column;gap:1.25rem;">
+      <div>
+        <label class="field-label" for="rsvp-nome">Nome Completo *</label>
+        <input id="rsvp-nome" type="text" placeholder="Ex: Maria da Silva" class="inp" required/>
+      </div>
+      
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;">
+        <div>
+          <label class="field-label" for="rsvp-telefone">WhatsApp</label>
+          <input id="rsvp-telefone" type="tel" placeholder="(00) 00000-0000" class="inp"/>
+        </div>
+        <div>
+          <label class="field-label" for="rsvp-acompanhantes">Nº de Acompanhantes</label>
+          <input id="rsvp-acompanhantes" type="number" min="0" max="10" placeholder="0" class="inp"/>
+        </div>
+      </div>
+
+      <div>
+        <label class="field-label">Você poderá comparecer? *</label>
+        <div style="display:flex;gap:1rem;margin-top:.3rem;">
+          <label style="flex:1;cursor:pointer;">
+            <input type="radio" name="rsvp-presenca" value="true" checked style="display:none;"/>
+            <div class="rsvp-radio btn-sim" style="border:1.5px solid var(--n200);border-radius:12px;padding:.8rem;text-align:center;font-size:.85rem;font-weight:500;color:var(--n500);transition:all .2s;">
+              Sim, estarei lá!
+            </div>
+          </label>
+          <label style="flex:1;cursor:pointer;">
+            <input type="radio" name="rsvp-presenca" value="false" style="display:none;"/>
+            <div class="rsvp-radio btn-nao" style="border:1.5px solid var(--n200);border-radius:12px;padding:.8rem;text-align:center;font-size:.85rem;font-weight:500;color:var(--n500);transition:all .2s;">
+              Não poderei ir
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <label class="field-label" for="rsvp-msg">Alguma observação?</label>
+        <textarea id="rsvp-msg" rows="2" placeholder="Restrições alimentares, recados..." class="inp"></textarea>
+      </div>
+
+      <button id="btn-rsvp-submit" type="submit" class="btn-sage" style="width:100%;margin-top:.5rem;padding:1rem;">
+        Enviar Confirmação
+      </button>
+      <p id="rsvp-erro" style="color:#b91c1c;font-size:.75rem;display:none;text-align:center;"></p>
+    </form>
+  </div>
+</section>
 
 <!-- ═══════════ LISTA ═══════════ -->
 <main id="lista" style="max-width:1100px;margin:0 auto;padding:4rem 1.25rem 5rem;">
@@ -763,8 +832,45 @@
     feedback('pendente','Pagamento em análise ⏳','Assim que confirmado, o presente estará garantido!');
     history.replaceState(null,'','/');
   }
+  // ──────────────────────────────────────
+  // RSVP HANDLER
+  // ──────────────────────────────────────
+  const formRsvp = $('form-rsvp');
+  if (formRsvp) {
+    formRsvp.addEventListener('submit', async e => {
+      e.preventDefault();
+      $('rsvp-erro').style.display = 'none';
+      const nome = $('rsvp-nome').value.trim();
+      const telefone = $('rsvp-telefone').value.trim();
+      const guestsCount = $('rsvp-acompanhantes').value.trim();
+      const isAttending = document.querySelector('input[name="rsvp-presenca"]:checked').value;
+      const notes = $('rsvp-msg').value.trim();
+
+      if (!nome) return setErr('rsvp-erro', 'Por favor, informe seu nome.');
+
+      const btnEl = $('btn-rsvp-submit');
+      setBtn(btnEl, true);
+
+      try {
+        const res = await fetch('/api/rsvp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: nome, phone: telefone, guestsCount, isAttending, notes })
+        });
+        const data = await res.json();
+        setBtn(btnEl, false);
+        if (!res.ok) throw new Error(data.error || 'Erro ao enviar confirmação.');
+        
+        // Limpar form e dar feedback
+        formRsvp.reset();
+        feedback('sucesso', 'Confirmação Enviada!', isAttending === 'true' ? 'Que maravilha! Mal podemos esperar para celebrar com você.' : 'Poxa, sentiremos sua falta, mas agradecemos por avisar!');
+      } catch (err) {
+        setBtn(btnEl, false);
+        setErr('rsvp-erro', err.message);
+      }
+    });
+  }
 })();
 </script>
-
 </body>
 </html>

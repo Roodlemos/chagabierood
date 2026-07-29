@@ -402,24 +402,14 @@
     </div>
 
     <nav class="sidebar-nav">
-      <div class="nav-label">Principal</div>
-      <a class="nav-item active" href="#">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Dashboard
-      </a>
-
-      <div class="nav-label" style="margin-top:1.25rem;">Dados</div>
-      <button class="nav-item" id="nav-all">
+      <div class="nav-label">Abas</div>
+      <button class="nav-item active" id="btn-tab-presentes" style="width:100%;text-align:left;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+        Presentes
+      </button>
+      <button class="nav-item" id="btn-tab-convidados" style="width:100%;text-align:left;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-        Todos os Presentes
-      </button>
-      <button class="nav-item" id="nav-approved">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        Aprovados
-      </button>
-      <button class="nav-item" id="nav-pending">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        Pendentes
+        Presenças (RSVP)
       </button>
 
       <div class="nav-label" style="margin-top:1.25rem;">Site</div>
@@ -452,8 +442,8 @@
     <!-- Topbar -->
     <div class="topbar">
       <div>
-        <div class="topbar-title">Painel de Presentes</div>
-        <div class="topbar-sub">Acompanhe os presentes recebidos em tempo real</div>
+        <div class="topbar-title" id="topbar-title">Painel de Presentes</div>
+        <div class="topbar-sub" id="topbar-sub">Acompanhe os presentes recebidos em tempo real</div>
       </div>
       <div class="topbar-actions">
         <button class="btn-refresh" id="btn-refresh">
@@ -471,6 +461,9 @@
 
     <!-- Content -->
     <div class="content">
+
+      <!-- ================= VIEW PRESENTES ================= -->
+      <div id="view-presentes">
 
       <!-- Stats -->
       <div class="stats-grid" id="stats-grid">
@@ -549,6 +542,59 @@
           </table>
         </div>
       </div>
+      </div>
+      <!-- ================= /VIEW PRESENTES ================= -->
+
+      <!-- ================= VIEW CONVIDADOS ================= -->
+      <div id="view-convidados" style="display:none;">
+        <div class="stats-grid">
+          <div class="stat-card green">
+            <div class="stat-label">Confirmados</div>
+            <div class="stat-value" id="stat-rsvp-yes">0</div>
+            <div class="stat-sub">presenças confirmadas</div>
+            <div class="stat-icon">✅</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-label">Total c/ Acompanhantes</div>
+            <div class="stat-value" id="stat-rsvp-total">0</div>
+            <div class="stat-sub">pessoas no total</div>
+            <div class="stat-icon">👥</div>
+          </div>
+          <div class="stat-card rose">
+            <div class="stat-label">Não irão</div>
+            <div class="stat-value" id="stat-rsvp-no">0</div>
+            <div class="stat-sub">ausências registradas</div>
+            <div class="stat-icon">❌</div>
+          </div>
+        </div>
+
+        <div class="table-section">
+          <div class="table-header">
+            <div>
+              <h3>Lista de Convidados</h3>
+              <p id="table-count-guests">Carregando…</p>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Convidado</th>
+                  <th>Telefone</th>
+                  <th>Status</th>
+                  <th>Acompanhantes</th>
+                  <th>Observação</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="table-body-guests">
+                <tr><td colspan="6"><div class="empty-state"><span>Carregando dados…</span></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- ================= /VIEW CONVIDADOS ================= -->
 
     </div><!-- /content -->
   </div><!-- /main -->
@@ -562,6 +608,8 @@
 
     // ── State ──────────────────────────────────────────────
     let allPurchases  = [];
+    let allGuests     = [];
+    let currentView   = 'presentes';
     let filterStatus  = 'todos';
     let searchQuery   = '';
     let sortCol       = 'createdAt';
@@ -584,14 +632,19 @@
     // ── Fetch data ─────────────────────────────────────────
     const loadData = async () => {
       try {
-        const res = await fetch('/admin/api/purchases');
-        if (res.status === 401 || res.status === 302) {
-          window.location.href = '/admin/login';
-          return;
+        if (currentView === 'presentes') {
+          const res = await fetch('/admin/api/purchases');
+          if (res.status === 401 || res.status === 302) return window.location.href = '/admin/login';
+          allPurchases = await res.json();
+          updateStats();
+          renderTable();
+        } else {
+          const res = await fetch('/admin/api/guests');
+          if (res.status === 401 || res.status === 302) return window.location.href = '/admin/login';
+          allGuests = await res.json();
+          updateStatsGuests();
+          renderTableGuests();
         }
-        allPurchases = await res.json();
-        updateStats();
-        renderTable();
       } catch (e) {
         console.error(e);
         toast('Erro ao carregar dados.');
@@ -673,10 +726,44 @@
           <td>${statusBadge(p.status)}</td>
           <td class="td-date">${fmtDate(p.createdAt)}</td>
           <td class="td-actions">
-            ${p.status !== 'approved'  ? `<button class="btn-action verify" data-id="${p.id}" data-action="verify">🔄 Verificar</button> ` : ''}
-            ${p.status !== 'approved'  ? `<button class="btn-action approve" data-id="${p.id}" data-action="approve">✓ Aprovar</button> ` : ''}
-            ${p.status !== 'rejected'  ? `<button class="btn-action reject"  data-id="${p.id}" data-action="reject">✗ Recusar</button> ` : ''}
+            ${p.status !== 'approved'  ? `<button class="btn-action verify" data-id="${p.id}" data-action="verify">🔄</button> ` : ''}
+            ${p.status !== 'approved'  ? `<button class="btn-action approve" data-id="${p.id}" data-action="approve">✓</button> ` : ''}
+            ${p.status !== 'rejected'  ? `<button class="btn-action reject"  data-id="${p.id}" data-action="reject">✗</button> ` : ''}
             <button class="btn-action delete" data-id="${p.id}" data-action="delete">🗑</button>
+          </td>
+        </tr>
+      `).join('');
+    };
+
+    // ── Convidados Logic ───────────────────────────────────
+    const updateStatsGuests = () => {
+      const yes = allGuests.filter(g => g.isAttending);
+      const no  = allGuests.filter(g => !g.isAttending);
+      const totalPessoas = yes.reduce((acc, g) => acc + 1 + (Number(g.guestsCount)||0), 0);
+      
+      document.getElementById('stat-rsvp-yes').textContent = yes.length;
+      document.getElementById('stat-rsvp-no').textContent = no.length;
+      document.getElementById('stat-rsvp-total').textContent = totalPessoas;
+    };
+
+    const renderTableGuests = () => {
+      document.getElementById('table-count-guests').textContent = `${allGuests.length} respostas`;
+      const tbody = document.getElementById('table-body-guests');
+      
+      if(allGuests.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><p>🌿</p><span>Nenhum convidado confirmou ainda.</span></div></td></tr>`;
+        return;
+      }
+      
+      tbody.innerHTML = allGuests.map(g => `
+        <tr data-id="${g.id}">
+          <td class="td-name">${escHtml(g.name)}</td>
+          <td>${escHtml(g.phone || '—')}</td>
+          <td>${g.isAttending ? '<span class="badge badge-approved">✅ Confirmado</span>' : '<span class="badge badge-rejected">❌ Não vai</span>'}</td>
+          <td>+${g.guestsCount || 0}</td>
+          <td class="td-msg" title="${escHtml(g.notes)}">${escHtml(g.notes)}</td>
+          <td class="td-actions">
+            <button class="btn-action delete" data-id="${g.id}" data-action="delete-guest">🗑</button>
           </td>
         </tr>
       `).join('');
@@ -707,6 +794,13 @@
         if (!confirm('Remover este registro?')) return;
         const res = await fetch(`/admin/api/purchases/${id}`, { method: 'DELETE' });
         if (res.ok) { allPurchases = allPurchases.filter(p => p.id !== id); updateStats(); renderTable(); toast('Registro removido.'); }
+        else toast('Erro ao remover.');
+        return;
+      }
+      if (action === 'delete-guest') {
+        if (!confirm('Remover este convidado?')) return;
+        const res = await fetch(`/admin/api/guests/${id}`, { method: 'DELETE' });
+        if (res.ok) { allGuests = allGuests.filter(g => g.id !== id); updateStatsGuests(); renderTableGuests(); toast('Convidado removido.'); }
         else toast('Erro ao remover.');
         return;
       }
@@ -761,20 +855,6 @@
       });
     });
 
-    // ── Sidebar nav links ──────────────────────────────────
-    ['nav-all','nav-approved','nav-pending'].forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.addEventListener('click', () => {
-        const map = { 'nav-all':'todos','nav-approved':'approved','nav-pending':'pending' };
-        filterStatus = map[id];
-        document.querySelectorAll('.filter-tab').forEach(b => {
-          b.classList.toggle('active', b.dataset.status === filterStatus);
-        });
-        renderTable();
-      });
-    });
-
     // ── Busca ──────────────────────────────────────────────
     let searchTimer;
     document.getElementById('search-input').addEventListener('input', (e) => {
@@ -793,11 +873,40 @@
 
         document.querySelectorAll('thead th').forEach(h => h.classList.remove('sorted'));
         th.classList.add('sorted');
-        th.querySelector('.sort-icon').textContent = sortDir === 1 ? '↑' : '↓';
+        const icon = th.querySelector('.sort-icon');
+        if(icon) icon.textContent = sortDir === 1 ? '↑' : '↓';
 
         renderTable();
       });
     });
+
+    // ── Sidebar Tabs ──────────────────────────────────────────
+    document.getElementById('btn-tab-presentes').addEventListener('click', (e) => {
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      document.getElementById('view-presentes').style.display = 'block';
+      document.getElementById('view-convidados').style.display = 'none';
+      document.getElementById('topbar-title').textContent = 'Painel de Presentes';
+      document.getElementById('topbar-sub').textContent = 'Acompanhe os presentes recebidos em tempo real';
+      currentView = 'presentes';
+      loadData();
+    });
+
+    document.getElementById('btn-tab-convidados').addEventListener('click', (e) => {
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      document.getElementById('view-presentes').style.display = 'none';
+      document.getElementById('view-convidados').style.display = 'block';
+      document.getElementById('topbar-title').textContent = 'Lista de Presença';
+      document.getElementById('topbar-sub').textContent = 'Gerencie as confirmações de presença do evento';
+      currentView = 'convidados';
+      loadData();
+    });
+
+    document.getElementById('btn-refresh').addEventListener('click', loadData);
+
+    // ── Init ────────────────────────────────────────────────
+    loadData();
 
     // ── Refresh ────────────────────────────────────────────
     document.getElementById('btn-refresh').addEventListener('click', () => {

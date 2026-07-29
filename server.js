@@ -44,10 +44,12 @@ app.use(session({
 const isVercelEnv = process.env.VERCEL === '1' || process.env.VERCEL;
 const DATA_DIR  = isVercelEnv ? '/tmp' : path.join(__dirname, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'purchases.json');
+const GUESTS_FILE = path.join(DATA_DIR, 'guests.json');
 
 if (!isVercelEnv) {
   if (!fs.existsSync(DATA_DIR))  fs.mkdirSync(DATA_DIR, { recursive: true });
   if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '[]', 'utf8');
+  if (!fs.existsSync(GUESTS_FILE)) fs.writeFileSync(GUESTS_FILE, '[]', 'utf8');
 }
 
 const loadPurchases = () => {
@@ -58,6 +60,16 @@ const loadPurchases = () => {
 const savePurchases = (list) => {
   if (isVercelEnv && !fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
   fs.writeFileSync(DATA_FILE, JSON.stringify(list, null, 2), 'utf8');
+};
+
+const loadGuests = () => {
+  try { return JSON.parse(fs.readFileSync(GUESTS_FILE, 'utf8')); }
+  catch { return []; }
+};
+
+const saveGuests = (list) => {
+  if (isVercelEnv && !fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.writeFileSync(GUESTS_FILE, JSON.stringify(list, null, 2), 'utf8');
 };
 
 // ── Middleware de log ─────────────────────────────────────────
@@ -222,6 +234,26 @@ app.post('/api/webhook', async (req, res) => {
   }
 });
 
+// ── POST /api/rsvp ────────────────────────────────────────────
+app.post('/api/rsvp', (req, res) => {
+  const { name, phone, guestsCount, isAttending, notes } = req.body;
+  if (!name || String(name).trim() === '') return res.status(400).json({ error: 'Nome é obrigatório.' });
+
+  const guests = loadGuests();
+  guests.push({
+    id: `rsvp-${Date.now()}`,
+    name: String(name).trim(),
+    phone: phone ? String(phone).trim() : '',
+    guestsCount: Number(guestsCount) || 0,
+    isAttending: isAttending === true || isAttending === 'true',
+    notes: notes ? String(notes).trim() : '',
+    createdAt: new Date().toISOString()
+  });
+
+  saveGuests(guests);
+  res.json({ ok: true, message: 'Confirmação enviada com sucesso!' });
+});
+
 // ================================================================
 // ROTAS ADMIN (protegidas por sessão)
 // ================================================================
@@ -328,6 +360,21 @@ app.patch('/admin/api/purchases/:id/status', requireAdmin, (req, res) => {
   purchases[idx].updatedAt = new Date().toISOString();
   savePurchases(purchases);
   res.json(purchases[idx]);
+});
+
+// GET /admin/api/guests — lista de convidados para o dashboard
+app.get('/admin/api/guests', requireAdmin, (req, res) => {
+  const guests = loadGuests();
+  guests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  res.json(guests);
+});
+
+// DELETE /admin/api/guests/:id — remove um convidado (admin)
+app.delete('/admin/api/guests/:id', requireAdmin, (req, res) => {
+  const guests = loadGuests();
+  const filtered = guests.filter(g => g.id !== req.params.id);
+  saveGuests(filtered);
+  res.json({ ok: true });
 });
 
 // POST /admin/logout
