@@ -46,10 +46,19 @@ const DATA_DIR  = isVercelEnv ? '/tmp' : path.join(__dirname, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'purchases.json');
 const GUESTS_FILE = path.join(DATA_DIR, 'guests.json');
 
+const GIFTS_FILE = path.join(DATA_DIR, 'gifts.json');
+
+const DEFAULT_GIFTS = [
+  { id:'panelas', cat:'cozinha', emoji:'🍳', nome:'Jogo de Panelas Antiaderente', desc:'5 peças premium com tampa de vidro, compatível com indução e fogão a gás.', valor:80, fav:false },
+  { id:'batedeira', cat:'eletros', emoji:'🍰', nome:'Batedeira Planetária 750W', desc:'12 velocidades, tigela inox 4,5L. Acessórios gancho, batedor e globo.', valor:85, fav:true },
+  { id:'jantar', cat:'mesa', emoji:'🍽️', nome:'Aparelho de Jantar 42 Peças', desc:'Porcelana branca para 6 pessoas: pratos, xícaras e travessas.', valor:75, fav:true }
+];
+
 if (!isVercelEnv) {
   if (!fs.existsSync(DATA_DIR))  fs.mkdirSync(DATA_DIR, { recursive: true });
   if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '[]', 'utf8');
   if (!fs.existsSync(GUESTS_FILE)) fs.writeFileSync(GUESTS_FILE, '[]', 'utf8');
+  if (!fs.existsSync(GIFTS_FILE)) fs.writeFileSync(GIFTS_FILE, JSON.stringify(DEFAULT_GIFTS, null, 2), 'utf8');
 }
 
 const loadPurchases = () => {
@@ -70,6 +79,16 @@ const loadGuests = () => {
 const saveGuests = (list) => {
   if (isVercelEnv && !fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
   fs.writeFileSync(GUESTS_FILE, JSON.stringify(list, null, 2), 'utf8');
+};
+
+const loadGifts = () => {
+  try { return JSON.parse(fs.readFileSync(GIFTS_FILE, 'utf8')); }
+  catch { return DEFAULT_GIFTS; }
+};
+
+const saveGifts = (list) => {
+  if (isVercelEnv && !fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.writeFileSync(GIFTS_FILE, JSON.stringify(list, null, 2), 'utf8');
 };
 
 // ── Middleware de log ─────────────────────────────────────────
@@ -97,6 +116,11 @@ app.get('/', (req, res) => {
 app.get('/sucesso',  (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/falha',    (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/pendente', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+
+// ── GET /api/gifts ────────────────────────────────────────────
+app.get('/api/gifts', (req, res) => {
+  res.json(loadGifts());
+});
 
 // ── POST /api/criar-preferencia ───────────────────────────────
 app.post('/api/criar-preferencia', async (req, res) => {
@@ -375,6 +399,38 @@ app.delete('/admin/api/guests/:id', requireAdmin, (req, res) => {
   const guests = loadGuests();
   const filtered = guests.filter(g => g.id !== req.params.id);
   saveGuests(filtered);
+  res.json({ ok: true });
+});
+
+// GET /admin/api/gifts — lista de presentes para gerenciar (pode usar o público mas deixamos separado)
+app.get('/admin/api/gifts', requireAdmin, (req, res) => {
+  res.json(loadGifts());
+});
+
+// POST /admin/api/gifts — adiciona um presente
+app.post('/admin/api/gifts', requireAdmin, (req, res) => {
+  const { cat, emoji, nome, desc, valor, fav } = req.body;
+  if (!nome || !valor || !cat) return res.status(400).json({ error: 'Dados incompletos.' });
+
+  const gifts = loadGifts();
+  gifts.push({
+    id: `gift-${Date.now()}`,
+    cat,
+    emoji: emoji || '🎁',
+    nome: String(nome).trim(),
+    desc: String(desc || '').trim(),
+    valor: parseFloat(valor),
+    fav: fav === true || fav === 'true'
+  });
+  saveGifts(gifts);
+  res.json({ ok: true });
+});
+
+// DELETE /admin/api/gifts/:id — remove um presente
+app.delete('/admin/api/gifts/:id', requireAdmin, (req, res) => {
+  const gifts = loadGifts();
+  const filtered = gifts.filter(g => g.id !== req.params.id);
+  saveGifts(filtered);
   res.json({ ok: true });
 });
 

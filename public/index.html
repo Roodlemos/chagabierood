@@ -589,49 +589,7 @@
   // ──────────────────────────────────────
   // DADOS
   // ──────────────────────────────────────
-  const PRESENTES = [
-    // COZINHA
-    { id:'panelas',       cat:'cozinha', emoji:'🍳', nome:'Jogo de Panelas Antiaderente',    desc:'5 peças premium com tampa de vidro, compatível com indução e fogão a gás.', valor:80, fav:false },
-    { id:'frigideiras',   cat:'cozinha', emoji:'🥘', nome:'Jogo de Frigideiras',             desc:'Kit 3 frigideiras antiaderentes em alumínio forjado (20, 24 e 28 cm).', valor:45, fav:false },
-    { id:'pressao',       cat:'cozinha', emoji:'🫕', nome:'Panela de Pressão 6L',            desc:'Aço inox com válvula de segurança, alça ergonômica e tampa de vidro.', valor:40, fav:false },
-    { id:'ferro',         cat:'cozinha', emoji:'🍲', nome:'Caçarola de Ferro Fundido',       desc:'Peça clássica para assados, risotos e cozidos. Dura gerações.', valor:65, fav:true  },
-    { id:'wok',           cat:'cozinha', emoji:'🥗', nome:'Wok Antiaderente 32cm',           desc:'Perfeita para stir-fry, salteados e frutos do mar. Alta durabilidade.', valor:30, fav:false },
-    { id:'utensilios',    cat:'cozinha', emoji:'🥄', nome:'Kit Utensílios de Silicone',      desc:'10 peças premium: espátulas, fouet, pincel e colheres até 230°C.', valor:25, fav:false },
-    { id:'facas',         cat:'cozinha', emoji:'🔪', nome:'Jogo de Facas Profissional',      desc:'5 facas em aço inox alemão + bloco de madeira elegante para guardar.', valor:55, fav:true  },
-    { id:'tabua',         cat:'cozinha', emoji:'🪵', nome:'Tábua de Corte em Bambu XL',      desc:'Bambu orgânico com ranhura e pés antiderrapantes. Grande e funcional.', valor:20,  fav:false },
-    { id:'escorredor',    cat:'cozinha', emoji:'🍝', nome:'Escorredor de Macarrão Inox',     desc:'Aço inox 18/10 com base e alças. 5L. Elegante e resistente.', valor:15,  fav:false },
-    { id:'formas',        cat:'cozinha', emoji:'🎂', nome:'Kit de Formas para Assar',        desc:'6 peças esmaltadas: assadeiras, forma de bolo, muffin e gratinar.', valor:35, fav:false },
-    { id:'potes',         cat:'cozinha', emoji:'🫙', nome:'Potes Herméticos de Vidro',       desc:'10 potes borossilicato com tampas herméticas. Elegantes e ecológicos.', valor:35, fav:false },
-    { id:'temperos',      cat:'cozinha', emoji:'🌿', nome:'Porta-Temperos Giratório',        desc:'Suporte de bambu com 12 frascos de vidro. Funcional e decorativo.', valor:25,  fav:false },
-    // ELETROS
-    { id:'airfryer',      cat:'eletros', emoji:'⚡', nome:'Air Fryer Digital 5L',            desc:'8 programas, display touch, temperatura até 200°C. Praticidade total.', valor:95, fav:true  },
-    { id:'liquidificador',cat:'eletros', emoji:'🥤', nome:'Liquidificador 1400W',            desc:'15 velocidades, jarra de vidro 2L, funções pulse e turbo.', valor:50, fav:false },
-    { id:'batedeira',     cat:'eletros', emoji:'🍰', nome:'Batedeira Planetária 750W',       desc:'12 velocidades, tigela inox 4,5L. Acessórios gancho, batedor e globo.', valor:85, fav:true  },
-    { id:'processador',   cat:'eletros', emoji:'🥬', nome:'Processador de Alimentos',        desc:'700W, 10 funções, 8 discos reversíveis, tigela 3,1L.', valor:60, fav:false },
-    { id:'cafeteira',     cat:'eletros', emoji:'☕', nome:'Cafeteira Espresso Automática',   desc:'Pressão 15 bar, vaporizador de leite, reservatório 1,8L.', valor:100, fav:true  },
-    { id:'chaleira',      cat:'eletros', emoji:'🫖', nome:'Chaleira Elétrica Inox',          desc:'1,7L, fervura rápida, base 360°. Elegante e prática.', valor:25,  fav:false },
-    { id:'sanduicheira',  cat:'eletros', emoji:'🥪', nome:'Grill e Sanduicheira',            desc:'Placas removíveis antiaderentes, termostato. Café da manhã perfeito.', valor:30, fav:false },
-    // MESA
-    { id:'jantar',        cat:'mesa',    emoji:'🍽️', nome:'Aparelho de Jantar 42 Peças',    desc:'Porcelana branca para 6 pessoas: pratos, xícaras e travessas.', valor:75, fav:true  },
-    { id:'cha-cafe',      cat:'mesa',    emoji:'☕', nome:'Aparelho de Chá e Café',          desc:'14 peças em porcelana fina com dourado: bule, leiteira e xícaras.', valor:45, fav:false },
-    { id:'tacas',         cat:'mesa',    emoji:'🥂', nome:'Jogo de Taças de Cristal',        desc:'12 taças borossilicato: 6 vinho tinto + 6 vinho branco.', valor:55, fav:true  },
-    { id:'copos',         cat:'mesa',    emoji:'🥛', nome:'Jogo de Copos Long Drink',        desc:'12 copos de vidro temperado 350ml para sucos e drinks.', valor:25, fav:false },
-    { id:'toalha-mesa',   cat:'mesa',    emoji:'🌸', nome:'Toalha de Mesa com Guardanapos', desc:'100% algodão egípcio 10 lugares + 12 guardanapos bordados.', valor:40, fav:false },
-    { id:'jogo-am',       cat:'mesa',    emoji:'🎨', nome:'Jogo Americano + Porta-Copos',   desc:'6 jogos em tecido + 6 porta-copos de bambu. Delicado e moderno.', valor:20,  fav:false },
-    { id:'galheteiro',    cat:'mesa',    emoji:'🧂', nome:'Galheteiro e Acessórios',        desc:'Saleiro, pimenteiro, paliteiro e porta-azeite em vidro com suporte inox.', valor:20,  fav:false },
-    // CASA
-    { id:'relogio',       cat:'casa',    emoji:'🕐', nome:'Relógio de Parede Minimalista',  desc:'Mecanismo silencioso, quadrante 40cm em madeira natural, estilo escandinavo.', valor:25, fav:false },
-    { id:'quadro',        cat:'casa',    emoji:'🖼️', nome:'Quadro Decorativo para Sala',   desc:'Canvas com moldura em madeira — arte botânica ou abstrata à escolha.', valor:30, fav:false },
-    { id:'vaso',          cat:'casa',    emoji:'🌺', nome:'Vaso Decorativo em Cerâmica',    desc:'Cerâmica artesanal esmaltada em tons neutros. Perfeito para plantas.', valor:20,  fav:false },
-    { id:'aromatizador',  cat:'casa',    emoji:'🕯️', nome:'Kit Velas Aromáticas',          desc:'3 velas de soja (baunilha, cedro e flor de algodão) em potes de vidro.', valor:30, fav:false },
-    { id:'organizadores', cat:'casa',    emoji:'🗂️', nome:'Kit Organizadores para Cozinha', desc:'Cestos de bambu, prateleiras e divisores de gaveta. Organização total.', valor:40, fav:false },
-    // BANHO
-    { id:'toalhas',       cat:'banho',   emoji:'🛁', nome:'Jogo de Toalhas de Banho',       desc:'6 peças 100% algodão egípcio 500g/m²: banho, rosto e piso.', valor:50, fav:true  },
-    { id:'cama',          cat:'banho',   emoji:'🛏️', nome:'Jogo de Cama King 300 Fios',     desc:'4 peças percal 300 fios. Macio, fresco e extremamente elegante.', valor:80, fav:true  },
-    { id:'roupao',        cat:'banho',   emoji:'🧖', nome:'Par de Roupões Casal',           desc:'100% algodão felpudo com bolsos e capuz. Conforto de spa em casa.', valor:45, fav:false },
-    { id:'acess-banho',   cat:'banho',   emoji:'🧴', nome:'Kit Acessórios de Banheiro',    desc:'5 peças em porcelana e bambu: saboneteira, porta-escova, dispenser e lixeira.', valor:35, fav:false },
-    { id:'panos',         cat:'banho',   emoji:'🌿', nome:'Jogo de Panos de Prato',         desc:'12 panos em linho e algodão, bordados à mão. Charme e funcionalidade.', valor:20,  fav:false },
-  ];
+  let PRESENTES = [];
 
   // ──────────────────────────────────────
   // CORES POR CATEGORIA
@@ -707,7 +665,21 @@
     });
   };
 
-  render('todos');
+  const loadGifts = async () => {
+    try {
+      grid.innerHTML=`<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--n300);"><span class="spinner"></span><p style="margin-top:1rem;">Carregando presentes...</p></div>`;
+      const res = await fetch('/api/gifts');
+      if (res.ok) {
+        PRESENTES = await res.json();
+      }
+    } catch (e) {
+      console.error('Erro ao carregar presentes:', e);
+    } finally {
+      render(catAtiva);
+    }
+  };
+
+  loadGifts();
 
   // ──────────────────────────────────────
   // FILTROS
