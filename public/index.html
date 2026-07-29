@@ -394,31 +394,8 @@
 
       <form id="form-rsvp" novalidate style="display:flex;flex-direction:column;gap:1.25rem;">
         <div>
-          <label class="field-label">Você poderá comparecer? *</label>
-          <div style="display:flex;gap:1rem;margin-top:.3rem;">
-            <label style="flex:1;cursor:pointer;">
-              <input type="radio" name="rsvp-presenca" value="true" checked style="display:none;"/>
-              <div class="rsvp-radio btn-sim" style="border:1.5px solid var(--n200);border-radius:12px;padding:.8rem;text-align:center;font-size:.85rem;font-weight:500;color:var(--n500);transition:all .2s;">
-                Sim, estarei lá!
-              </div>
-            </label>
-            <label style="flex:1;cursor:pointer;">
-              <input type="radio" name="rsvp-presenca" value="false" style="display:none;"/>
-              <div class="rsvp-radio btn-nao" style="border:1.5px solid var(--n200);border-radius:12px;padding:.8rem;text-align:center;font-size:.85rem;font-weight:500;color:var(--n500);transition:all .2s;">
-                Não poderei ir
-              </div>
-            </label>
-          </div>
-        </div>
-
-        <div>
           <label class="field-label" for="rsvp-nome">Seu Nome Completo *</label>
           <input id="rsvp-nome" type="text" placeholder="Ex: Maria da Silva" class="inp" required/>
-        </div>
-        
-        <div>
-          <label class="field-label" for="rsvp-telefone">WhatsApp</label>
-          <input id="rsvp-telefone" type="tel" placeholder="(00) 00000-0000" class="inp"/>
         </div>
 
         <div id="rsvp-acompanhantes-wrapper">
@@ -432,11 +409,6 @@
           <div id="companions-list" style="display:flex;flex-direction:column;gap:.5rem;">
             <!-- Companions dinâmicos aqui -->
           </div>
-        </div>
-
-        <div>
-          <label class="field-label" for="rsvp-msg">Alguma observação?</label>
-          <textarea id="rsvp-msg" rows="2" placeholder="Restrições alimentares, recados..." class="inp"></textarea>
         </div>
 
         <p id="rsvp-erro" style="color:#b91c1c;font-size:.75rem;display:none;text-align:center;"></p>
@@ -896,25 +868,10 @@
 
   const formRsvp = $('form-rsvp');
   if (formRsvp) {
-    // Show/hide companions section based on attending status
-    document.querySelectorAll('input[name="rsvp-presenca"]').forEach(radio => {
-      radio.addEventListener('change', (e) => {
-        if(e.target.value === 'false') {
-          $('rsvp-acompanhantes-wrapper').style.display = 'none';
-        } else {
-          $('rsvp-acompanhantes-wrapper').style.display = 'block';
-        }
-      });
-    });
-
     formRsvp.addEventListener('submit', async e => {
       e.preventDefault();
       $('rsvp-erro').style.display = 'none';
       const nome = $('rsvp-nome').value.trim();
-      const telefone = $('rsvp-telefone').value.trim();
-      
-      const isAttending = document.querySelector('input[name="rsvp-presenca"]:checked').value;
-      const notes = $('rsvp-msg').value.trim();
 
       if (!nome) return setErr('rsvp-erro', 'Por favor, informe seu nome.');
 
@@ -934,11 +891,11 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             name: nome, 
-            phone: telefone, 
-            guestsCount: isAttending === 'true' ? companions.length : 0, 
-            companions: isAttending === 'true' ? companions : [],
-            isAttending, 
-            notes 
+            phone: '', 
+            guestsCount: companions.length, 
+            companions: companions,
+            isAttending: 'true', 
+            notes: '' 
           })
         });
         const data = await res.json();
@@ -946,7 +903,7 @@
         if (!res.ok) throw new Error(data.error || 'Erro ao enviar confirmação.');
         
         hide('modal-rsvp');
-        feedback('sucesso', 'Confirmação Enviada!', isAttending === 'true' ? 'Que maravilha! Mal podemos esperar para celebrar com você.' : 'Poxa, sentiremos sua falta, mas agradecemos por avisar!');
+        feedback('sucesso', 'Confirmação Enviada!', 'Que maravilha! Mal podemos esperar para celebrar com você.');
       } catch (err) {
         setBtn(btnEl, false);
         setErr('rsvp-erro', err.message);
