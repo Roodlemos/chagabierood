@@ -545,13 +545,12 @@
       </div>
       <!-- ================= /VIEW PRESENTES ================= -->
 
-      <!-- ================= VIEW CONVIDADOS ================= -->
       <div id="view-convidados" style="display:none;">
         <div class="stats-grid">
           <div class="stat-card green">
             <div class="stat-label">Confirmados</div>
             <div class="stat-value" id="stat-rsvp-yes">0</div>
-            <div class="stat-sub">presenças confirmadas</div>
+            <div class="stat-sub">titulares que confirmaram</div>
             <div class="stat-icon">✅</div>
           </div>
           <div class="stat-card blue">
@@ -559,12 +558,6 @@
             <div class="stat-value" id="stat-rsvp-total">0</div>
             <div class="stat-sub">pessoas no total</div>
             <div class="stat-icon">👥</div>
-          </div>
-          <div class="stat-card rose">
-            <div class="stat-label">Não irão</div>
-            <div class="stat-value" id="stat-rsvp-no">0</div>
-            <div class="stat-sub">ausências registradas</div>
-            <div class="stat-icon">❌</div>
           </div>
         </div>
 
@@ -580,15 +573,14 @@
               <thead>
                 <tr>
                   <th>Convidado</th>
-                  <th>Telefone</th>
-                  <th>Status</th>
                   <th>Acompanhantes</th>
-                  <th>Observação</th>
+                  <th>Total Pessoas</th>
+                  <th>Data</th>
                   <th>Ações</th>
                 </tr>
               </thead>
               <tbody id="table-body-guests">
-                <tr><td colspan="6"><div class="empty-state"><span>Carregando dados…</span></div></td></tr>
+                <tr><td colspan="5"><div class="empty-state"><span>Carregando dados…</span></div></td></tr>
               </tbody>
             </table>
           </div>
@@ -737,34 +729,31 @@
 
     // ── Convidados Logic ───────────────────────────────────
     const updateStatsGuests = () => {
-      const yes = allGuests.filter(g => g.isAttending);
-      const no  = allGuests.filter(g => !g.isAttending);
-      const totalPessoas = yes.reduce((acc, g) => acc + 1 + (Number(g.guestsCount)||0), 0);
+      const totalPessoas = allGuests.reduce((acc, g) => acc + 1 + (Number(g.guestsCount)||0), 0);
       
-      document.getElementById('stat-rsvp-yes').textContent = yes.length;
-      document.getElementById('stat-rsvp-no').textContent = no.length;
+      document.getElementById('stat-rsvp-yes').textContent = allGuests.length;
       document.getElementById('stat-rsvp-total').textContent = totalPessoas;
     };
 
     const renderTableGuests = () => {
-      document.getElementById('table-count-guests').textContent = `${allGuests.length} respostas`;
+      document.getElementById('table-count-guests').textContent = `${allGuests.length} confirmações`;
       const tbody = document.getElementById('table-body-guests');
       
       if(allGuests.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><p>🌿</p><span>Nenhum convidado confirmou ainda.</span></div></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><p>🌿</p><span>Nenhum convidado confirmou ainda.</span></div></td></tr>`;
         return;
       }
       
       tbody.innerHTML = allGuests.map(g => `
         <tr data-id="${g.id}">
           <td class="td-name">${escHtml(g.name)}</td>
-          <td>${escHtml(g.phone || '—')}</td>
-          <td>${g.isAttending ? '<span class="badge badge-approved">✅ Confirmado</span>' : '<span class="badge badge-rejected">❌ Não vai</span>'}</td>
           <td>
-            +${g.guestsCount || 0}
-            ${g.companions && g.companions.length > 0 ? `<div style="font-size:0.7rem;color:var(--warm-500);margin-top:0.2rem;line-height:1.4;">${g.companions.map(escHtml).join(', ')}</div>` : ''}
+            ${g.companions && g.companions.length > 0 ? `<div style="font-size:0.75rem;color:var(--warm-700);line-height:1.5;">${g.companions.map(escHtml).join('<br>')}</div>` : '<span style="color:var(--warm-300);font-size:0.75rem;">—</span>'}
           </td>
-          <td class="td-msg" title="${escHtml(g.notes)}">${escHtml(g.notes)}</td>
+          <td style="font-weight:600;color:var(--sage-700);">
+            ${1 + (g.guestsCount || 0)}
+          </td>
+          <td class="td-date">${fmtDate(g.createdAt)}</td>
           <td class="td-actions">
             <button class="btn-action delete" data-id="${g.id}" data-action="delete-guest">🗑</button>
           </td>
