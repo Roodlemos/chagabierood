@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chá de Panela — Gabriela &amp; Rodolfo · 08/08</title>
+  <meta name="description" content="Lista de presentes do Chá de Panela de Gabriela e Rodolfo, dia 08 de Agosto em Lagoa Santa, MG."/>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=Dancing+Script:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+  <style>
+    /* ──────────────────────────────────── */
+    /* ROOT TOKENS                          */
+    /* ──────────────────────────────────── */
+    :root {
+      /* Sages — verde floresta refinado */
+      --s900: #162612;   /* hero mais profundo */
+      --s800: #1f3318;
+      --s700: #2c4a21;
+      --s600: #3a6030;
+      --s500: #4e7d43;
+      --s400: #6ca05e;
+      --s300: #95bf89;
+      --s200: #c0d9ba;
+      --s100: #e2eed f;
+      --s50:  #f3f7f1;
+
+      /* Champagne gold — mais quente e sofisticado */
+      --g900: #6b4818;
+      --g700: #9a6e2a;
+      --g600: #b5863a;
+      --g500: #c9a05a;
+      --g400: #debb82;
+      --g300: #ecd4aa;
+      --g200: #f5e7cc;
+      --g100: #faf3e4;
+
+      /* Neutros quentes */
+      --n900: #211a13;
+      --n800: #332a1f;
+      --n600: #5e4e3c;
+      --n500: #7e6a56;
+      --n400: #a08c77;
+      --n300: #c4b09a;
+      --n200: #dfd0bc;
+      --n100: #f0e7d8;
+      --n50:  #faf6f0;   /* fundo geral */
+
+      /* Blush — acento suave rosado para "meiguice" */
+      --blush: #f5e8e2;
+      --blush-mid: #e8c8b8;
+
+      /* Sombras */
+      --shadow-card:  0 2px 12px rgba(33,26,19,0.07), 0 1px 3px rgba(33,26,19,0.05);
+      --shadow-hover: 0 12px 36px rgba(33,26,19,0.13), 0 3px 8px rgba(33,26,19,0.07);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--n50); color: var(--n900); }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--n100); }
+    ::-webkit-scrollbar-thumb { background: var(--s400); border-radius: 4px; }
+
+    /* ──────────────────────────────────── */
+    /* HERO                                 */
+    /* ──────────────────────────────────── */
+    .hero {
+      background:
+        linear-gradient(170deg, var(--s900) 0%, var(--s800) 30%, #233d18 55%, var(--s900) 100%);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 55% at 12% 65%, rgba(78,125,67,.28) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 40% at 88% 22%, rgba(201,160,90,.16) 0%, transparent 50%),
+        radial-gradient(ellipse 35% 30% at 52% 88%, rgba(108,160,94,.14) 0%, transparent 52%);
+    }
+    .hero-leaf {
+      position: absolute; pointer-events: none;
+      opacity: .06; color: var(--s300);
+    }
+
+    /* Texto com gradiente dourado animado */
+    .text-gold-anim {
+      background: linear-gradient(110deg,
+        var(--g900) 0%, var(--g600) 20%, var(--g400) 40%,
+        var(--g300) 50%, var(--g400) 60%, var(--g600) 80%, var(--g900) 100%);
+      background-size: 250% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: goldShimmer 5s linear infinite;
+    }
+    @keyframes goldShimmer {
+      0%   { background-position: 200% center; }
+      100% { background-position: -200% center; }
+    }
+
+    /* Float suave */
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
+    .float { animation: float 6s ease-in-out infinite; }
+
+    /* ──────────────────────────────────── */
+    /* FILTROS                              */
+    /* ──────────────────────────────────── */
+    .cat-btn {
+      padding: .45rem 1.1rem; border-radius: 100px;
+      font-size: .78rem; font-weight: 500;
+      border: 1.5px solid var(--n200);
+      background: #fff; color: var(--n500);
+      cursor: pointer; transition: all .2s; white-space: nowrap;
+    }
+    .cat-btn:hover { border-color: var(--g500); color: var(--g700); }
+    .cat-btn.active {
+      background: linear-gradient(135deg, var(--s700), var(--s600));
+      border-color: transparent; color: #fff;
+      box-shadow: 0 3px 12px rgba(44,74,33,.28);
+    }
+
+    /* ──────────────────────────────────── */
+    /* CARD CONTRIBUIÇÃO LIVRE — compacto   */
+    /* ──────────────────────────────────── */
+    .card-livre {
+      background: linear-gradient(135deg, #fff 0%, var(--g100) 60%, #fff8ee 100%);
+      border: 1.5px solid var(--g300);
+      border-radius: 20px;
+      padding: 1.5rem 1.75rem;
+      position: relative; overflow: hidden;
+      box-shadow: 0 4px 24px rgba(155,110,42,.12), var(--shadow-card);
+    }
+    /* Brilho dourado canto superior direito */
+    .card-livre::before {
+      content: '';
+      position: absolute; top: -40px; right: -40px;
+      width: 140px; height: 140px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(222,187,130,.45), transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ──────────────────────────────────── */
+    /* GIFT CARDS                           */
+    /* ──────────────────────────────────── */
+    .gift-card {
+      background: #fff;
+      border: 1px solid var(--n100);
+      border-radius: 18px;
+      padding: 1.4rem;
+      display: flex; flex-direction: column; gap: .8rem;
+      box-shadow: var(--shadow-card);
+      position: relative; overflow: hidden;
+      transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    }
+    .gift-card::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, transparent, var(--g500), transparent);
+      opacity: 0; transition: opacity .22s;
+    }
+    .gift-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+      border-color: var(--g300);
+    }
+    .gift-card:hover::after { opacity: 1; }
+
+    /* Badge "Favorito" */
+    .fav-badge {
+      position: absolute; top: .85rem; right: .85rem;
+      background: linear-gradient(135deg, var(--g600), var(--g400));
+      color: #fff; font-size: .62rem; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase;
+      padding: .28rem .65rem; border-radius: 100px;
+      box-shadow: 0 2px 8px rgba(181,134,58,.35);
+    }
+
+    /* Valor badge */
+    .valor-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--g100), var(--g200));
+      border: 1px solid var(--g300);
+      color: var(--g700); font-weight: 700; font-size: .78rem;
+      padding: .28rem .8rem; border-radius: 100px;
+    }
+
+    /* Categoria tag */
+    .cat-tag {
+      display: inline-flex; align-items: center;
+      font-size: .67rem; font-weight: 600; letter-spacing: .07em;
+      text-transform: uppercase; padding: .25rem .65rem;
+      border-radius: 100px;
+    }
+
+    /* ──────────────────────────────────── */
+    /* INPUTS                               */
+    /* ──────────────────────────────────── */
+    .inp {
+      width: 100%;
+      padding: .7rem 1rem;
+      border: 1.5px solid var(--n200);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--n900); font-size: .84rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .inp:focus { border-color: var(--g500); box-shadow: 0 0 0 3px rgba(201,160,90,.15); }
+    .inp::placeholder { color: var(--n300); }
+    textarea.inp { resize: none; }
+
+    /* ──────────────────────────────────── */
+    /* BOTÕES                               */
+    /* ──────────────────────────────────── */
+    .btn-gold {
+      display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
+      background: linear-gradient(135deg, var(--g700) 0%, var(--g500) 50%, var(--g600) 100%);
+      background-size: 200% auto;
+      color: #fff; font-weight: 600; font-size: .82rem;
+      padding: .8rem 1.5rem; border-radius: 12px;
+      border: none; cursor: pointer;
+      transition: background-position .4s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 16px rgba(155,110,42,.32);
+      letter-spacing: .01em; white-space: nowrap;
+    }
+    .btn-gold:hover { background-position: right center; box-shadow: 0 6px 22px rgba(155,110,42,.42); }
+    .btn-gold:active { transform: scale(.97); }
+    .btn-gold:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    .btn-sage {
+      display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
+      background: linear-gradient(135deg, var(--s700), var(--s500));
+      color: #fff; font-weight: 600; font-size: .82rem;
+      padding: .8rem 1.5rem; border-radius: 12px;
+      border: none; cursor: pointer;
+      transition: filter .2s, transform .15s;
+      box-shadow: 0 4px 14px rgba(44,74,33,.28);
+    }
+    .btn-sage:hover { filter: brightness(1.1); }
+    .btn-sage:active { transform: scale(.97); }
+
+    /* ──────────────────────────────────── */
+    /* MODAIS                               */
+    /* ──────────────────────────────────── */
+    .overlay { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); background: rgba(22,38,18,.72); }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .modal-card { animation: slideUp .4s cubic-bezier(.16,1,.3,1); }
+
+    /* Spinner */
+    .spinner {
+      width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.25);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin .75s linear infinite; display: inline-block; flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ──────────────────────────────────── */
+    /* LABEL  UTIL                          */
+    /* ──────────────────────────────────── */
+    .field-label {
+      display: block; font-size: .68rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: .1em;
+      color: var(--n500); margin-bottom: .45rem;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ═══════════ HERO ═══════════ -->
+<header class="hero">
+  <!-- Folhas decorativas -->
+  <svg class="hero-leaf" style="top:-5%;left:-6%;width:360px;height:360px;" viewBox="0 0 200 200" fill="currentColor">
+    <path d="M100,5 Q175,20 193,100 Q175,180 100,195 Q25,180 7,100 Q25,20 100,5Z"/>
+  </svg>
+  <svg class="hero-leaf" style="bottom:-8%;right:-4%;width:300px;height:300px;" viewBox="0 0 200 200" fill="currentColor">
+    <ellipse cx="100" cy="100" rx="90" ry="68"/>
+  </svg>
+  <svg class="hero-leaf" style="top:22%;right:6%;width:160px;height:160px;" viewBox="0 0 100 100" fill="currentColor">
+    <circle cx="50" cy="50" r="45"/>
+  </svg>
+
+  <div style="position:relative;z-index:10;max-width:760px;margin:0 auto;padding:5.5rem 1.5rem 5rem;text-align:center;">
+
+    <!-- Ícone flutuante -->
+    <div class="float" style="display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);margin-bottom:2rem;font-size:1.6rem;">
+      🌿
+    </div>
+
+    <!-- Convite -->
+    <p style="color:var(--g300);font-size:.75rem;letter-spacing:.3em;text-transform:uppercase;font-weight:400;margin-bottom:1rem;">
+      Você está convidado para o
+    </p>
+
+    <!-- Título -->
+    <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(3.5rem,10vw,6.5rem);font-weight:300;color:#fff;line-height:1;margin-bottom:.4rem;letter-spacing:-.01em;">
+      Chá de Panela
+    </h1>
+
+    <!-- Casal — script cursivo dourado -->
+    <p class="text-gold-anim" style="font-family:'Dancing Script',cursive;font-size:clamp(2rem,6vw,3.2rem);font-weight:600;margin-bottom:1.75rem;margin-top:.3rem;">
+      Gabriela &amp; Rodolfo
+    </p>
+
+    <!-- Linha ornamental -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:.75rem;margin-bottom:1.75rem;">
+      <div style="height:1px;width:64px;background:linear-gradient(to right,transparent,var(--g400));"></div>
+      <span style="color:var(--g400);font-size:1rem;">✦</span>
+      <div style="height:1px;width:64px;background:linear-gradient(to left,transparent,var(--g400));"></div>
+    </div>
+
+    <!-- Mensagem -->
+    <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(1.05rem,3vw,1.3rem);color:rgba(255,255,255,.72);line-height:1.75;max-width:560px;margin:0 auto 2.5rem;font-weight:300;">
+      "Com imensa alegria, abrimos nossa casa e nossos corações<br class="hidden sm:block"/> para celebrar o início da nossa vida juntos."
+    </p>
+
+    <!-- Evento info -->
+    <div style="display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:1.5rem 2rem;padding:1.1rem 2rem;border-radius:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);">
+      <div style="text-align:center;">
+        <p style="font-size:.62rem;color:var(--g300);text-transform:uppercase;letter-spacing:.18em;font-weight:500;margin-bottom:.2rem;">Data</p>
+        <p style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:#fff;font-weight:500;">08 de Agosto de 2026</p>
+      </div>
+      <div style="width:1px;height:32px;background:rgba(255,255,255,.15);"></div>
+      <div style="text-align:center;">
+        <p style="font-size:.62rem;color:var(--g300);text-transform:uppercase;letter-spacing:.18em;font-weight:500;margin-bottom:.2rem;">Local</p>
+        <p style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:#fff;font-weight:500;">Lagoa Santa · Minas Gerais</p>
+      </div>
+    </div>
+
+    <!-- Seta scroll -->
+    <div style="margin-top:3rem;animation:float 2.5s ease-in-out infinite;">
+      <a href="#lista" style="color:rgba(255,255,255,.28);transition:color .2s;display:inline-block;" aria-label="Ver presentes">
+        <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════ LISTA ═══════════ -->
+<main id="lista" style="max-width:1100px;margin:0 auto;padding:4rem 1.25rem 5rem;">
+
+  <!-- Cabeçalho seção -->
+  <div style="text-align:center;margin-bottom:3rem;">
+    <p style="font-size:.65rem;font-weight:600;letter-spacing:.25em;text-transform:uppercase;color:var(--g600);margin-bottom:.6rem;">Nossa</p>
+    <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,6vw,3.5rem);font-weight:400;color:var(--s800);margin-bottom:1rem;line-height:1.1;">
+      Lista de Presentes
+    </h2>
+    <p style="font-size:.9rem;color:var(--n400);max-width:500px;margin:0 auto;line-height:1.7;font-weight:300;">
+      Escolha um item especial ou surpreenda-nos com um valor à sua escolha. Qualquer gesto de carinho faz parte da nossa história. 🌿
+    </p>
+  </div>
+
+  <!-- Filtros -->
+  <div id="cat-filters" style="display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:2.5rem;">
+    <button class="cat-btn active" data-cat="todos">✨ Todos</button>
+    <button class="cat-btn" data-cat="cozinha">🍳 Cozinha</button>
+    <button class="cat-btn" data-cat="mesa">🍽️ Mesa e Sala</button>
+    <button class="cat-btn" data-cat="eletros">⚡ Eletrodomésticos</button>
+    <button class="cat-btn" data-cat="casa">🏡 Casa e Decoração</button>
+    <button class="cat-btn" data-cat="banho">🛁 Banho e Enxoval</button>
+  </div>
+
+  <!-- ── CARD CONTRIBUIÇÃO LIVRE (compacto, horizontal) ── -->
+  <div class="card-livre" style="margin-bottom:2rem;" id="card-livre">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:1.25rem 2rem;">
+
+      <!-- Texto lado esquerdo -->
+      <div style="flex:1;min-width:240px;">
+        <span style="display:inline-block;background:linear-gradient(135deg,var(--g600),var(--g400));color:#fff;font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.28rem .75rem;border-radius:100px;margin-bottom:.65rem;box-shadow:0 2px 8px rgba(155,110,42,.3);">
+          ✦ Valor à sua escolha
+        </span>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.65rem;font-weight:600;color:var(--s800);margin-bottom:.25rem;line-height:1.2;">
+          Contribuição Livre
+        </h3>
+        <p style="font-size:.8rem;color:var(--n500);line-height:1.6;font-weight:300;">
+          Presenteie com o valor que desejar e deixe uma mensagem especial para o casal.
+        </p>
+      </div>
+
+      <!-- Formulário lado direito -->
+      <form id="form-livre" novalidate style="flex:2;min-width:300px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem;align-items:end;">
+
+          <div>
+            <label class="field-label" for="livre-valor">Valor (R$) *</label>
+            <div style="position:relative;">
+              <span style="position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:var(--n400);font-size:.82rem;font-weight:500;">R$</span>
+              <input id="livre-valor" type="text" inputmode="decimal" placeholder="0,00" class="inp" style="padding-left:2.2rem;" required/>
+            </div>
+          </div>
+
+          <div>
+            <label class="field-label" for="livre-nome">Seu Nome *</label>
+            <input id="livre-nome" type="text" placeholder="Seu nome" class="inp" required/>
+          </div>
+
+          <div style="grid-column:1/-1;">
+            <label class="field-label" for="livre-msg">Mensagem <span style="color:var(--n300);font-weight:400;text-transform:none;">(opcional)</span></label>
+            <input id="livre-msg" type="text" placeholder="Uma mensagem especial para Gabriela e Rodolfo…" class="inp"/>
+          </div>
+
+          <div style="grid-column:1/-1;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+            <button id="btn-livre" type="submit" class="btn-gold" style="flex:1;min-width:200px;padding:.8rem 1.25rem;font-size:.8rem;">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+              Presentear com este Valor
+            </button>
+            <p id="livre-erro" style="color:#b91c1c;font-size:.75rem;display:none;"></p>
+          </div>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Divisor -->
+  <div style="display:flex;align-items:center;gap:.9rem;margin:2.25rem 0 2rem;">
+    <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,var(--n200),transparent);"></div>
+    <span style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--n400);font-size:.9rem;white-space:nowrap;">presentes sugeridos</span>
+    <div style="flex:1;height:1px;background:linear-gradient(to right,transparent,var(--n200),transparent);"></div>
+  </div>
+
+  <!-- Grid -->
+  <div id="gift-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.1rem;">
+  </div>
+
+</main>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer style="background:var(--s900);color:rgba(255,255,255,.5);padding:3.5rem 1.5rem;text-align:center;">
+  <p class="text-gold-anim" style="font-family:'Dancing Script',cursive;font-size:1.9rem;font-weight:600;margin-bottom:.2rem;">
+    Gabriela &amp; Rodolfo
+  </p>
+  <p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1rem;color:rgba(255,255,255,.4);margin-bottom:.6rem;">
+    08 de Agosto de 2026 · Lagoa Santa, MG
+  </p>
+  <p style="font-size:.75rem;color:rgba(255,255,255,.2);margin-bottom:1.5rem;">Obrigado por fazer parte desse momento tão especial 💚</p>
+  <div style="display:flex;align-items:center;justify-content:center;gap:.75rem;">
+    <div style="height:1px;width:36px;background:rgba(201,160,90,.3);"></div>
+    <span style="color:rgba(201,160,90,.4);font-size:.9rem;">✦</span>
+    <div style="height:1px;width:36px;background:rgba(201,160,90,.3);"></div>
+  </div>
+  <p style="font-size:.7rem;color:rgba(255,255,255,.15);margin-top:1.25rem;">
+    Pagamentos seguros por <span style="color:rgba(255,255,255,.3);font-weight:600;">Mercado Pago</span>
+  </p>
+</footer>
+
+<!-- ═══════════ MODAL PRESENTE ═══════════ -->
+<div id="modal-presente" style="position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:1rem;display:none;" role="dialog" aria-modal="true">
+  <div class="overlay" id="modal-bg" style="position:absolute;inset:0;"></div>
+  <div class="modal-card" style="position:relative;background:#fff;border-radius:24px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.35);">
+    <div style="height:3.5px;background:linear-gradient(90deg,var(--s400),var(--g500),var(--g300),var(--g500),var(--s400));background-size:200% auto;animation:goldShimmer 3s linear infinite;"></div>
+    <div style="padding:1.75rem 1.75rem 2rem;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem;">
+        <div>
+          <p style="font-size:.65rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--g600);margin-bottom:.3rem;">Presenteando</p>
+          <h2 id="modal-h2" style="font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--s800);line-height:1.2;"></h2>
+          <p style="font-size:.8rem;color:var(--n400);margin-top:.2rem;">Valor: <span id="modal-val" style="font-weight:700;color:var(--g700);"></span></p>
+        </div>
+        <button id="btn-modal-close" style="color:var(--n300);padding:.4rem;border-radius:9px;border:none;background:none;cursor:pointer;transition:color .2s,background .2s;flex-shrink:0;margin-top:-.2rem;" aria-label="Fechar">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form id="form-modal" novalidate>
+        <div style="display:flex;flex-direction:column;gap:.85rem;">
+          <div>
+            <label class="field-label" for="modal-nome">Seu Nome *</label>
+            <input id="modal-nome" type="text" placeholder="Como devemos te chamar?" class="inp" required/>
+          </div>
+          <div>
+            <label class="field-label" for="modal-msg">Mensagem de Carinho <span style="color:var(--n300);font-weight:400;text-transform:none;">(opcional)</span></label>
+            <textarea id="modal-msg" rows="3" placeholder="Deixe um recado especial para Gabriela e Rodolfo…" class="inp"></textarea>
+          </div>
+          <p id="modal-erro" style="color:#b91c1c;font-size:.75rem;display:none;"></p>
+          <button id="btn-modal-pay" type="submit" class="btn-gold" style="width:100%;padding:.85rem;">
+            <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+            Ir para o Pagamento
+          </button>
+        </div>
+      </form>
+      <div style="display:flex;align-items:center;justify-content:center;gap:.4rem;margin-top:1rem;font-size:.7rem;color:var(--n300);">
+        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        Pagamento seguro · Mercado Pago
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal loading -->
+<div id="modal-loading" style="position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:1rem;display:none;">
+  <div class="overlay" style="position:absolute;inset:0;"></div>
+  <div style="position:relative;background:#fff;border-radius:24px;padding:2.5rem;display:flex;flex-direction:column;align-items:center;gap:1rem;animation:slideUp .3s ease;box-shadow:0 24px 64px rgba(0,0,0,.3);">
+    <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--s700),var(--s500));display:flex;align-items:center;justify-content:center;">
+      <div class="spinner"></div>
+    </div>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:600;color:var(--s800);">Preparando seu presente…</p>
+    <p style="font-size:.8rem;color:var(--n400);text-align:center;max-width:240px;">Conectando ao Mercado Pago com segurança.</p>
+  </div>
+</div>
+
+<!-- Modal feedback -->
+<div id="modal-feedback" style="position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;padding:1rem;display:none;" role="alertdialog">
+  <div class="overlay" style="position:absolute;inset:0;"></div>
+  <div class="modal-card" style="position:relative;background:#fff;border-radius:24px;width:100%;max-width:360px;padding:2.25rem;text-align:center;box-shadow:0 28px 70px rgba(0,0,0,.32);">
+    <div id="fb-icon" style="font-size:3.5rem;margin-bottom:.75rem;"></div>
+    <h3 id="fb-title" style="font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:600;color:var(--s800);margin-bottom:.5rem;"></h3>
+    <p id="fb-msg" style="font-size:.82rem;color:var(--n400);line-height:1.7;margin-bottom:1.5rem;font-weight:300;"></p>
+    <button id="btn-fb-close" class="btn-sage" style="width:100%;">Fechar</button>
+  </div>
+</div>
+
+<!-- ═══════════ JAVASCRIPT ═══════════ -->
+<script>
+(() => {
+  'use strict';
+
+  // ──────────────────────────────────────
+  // DADOS
+  // ──────────────────────────────────────
+  const PRESENTES = [
+    // COZINHA
+    { id:'panelas',       cat:'cozinha', emoji:'🍳', nome:'Jogo de Panelas Antiaderente',    desc:'5 peças premium com tampa de vidro, compatível com indução e fogão a gás.', valor:350, fav:false },
+    { id:'frigideiras',   cat:'cozinha', emoji:'🥘', nome:'Jogo de Frigideiras',             desc:'Kit 3 frigideiras antiaderentes em alumínio forjado (20, 24 e 28 cm).', valor:180, fav:false },
+    { id:'pressao',       cat:'cozinha', emoji:'🫕', nome:'Panela de Pressão 6L',            desc:'Aço inox com válvula de segurança, alça ergonômica e tampa de vidro.', valor:160, fav:false },
+    { id:'ferro',         cat:'cozinha', emoji:'🍲', nome:'Caçarola de Ferro Fundido',       desc:'Peça clássica para assados, risotos e cozidos. Dura gerações.', valor:290, fav:true  },
+    { id:'wok',           cat:'cozinha', emoji:'🥗', nome:'Wok Antiaderente 32cm',           desc:'Perfeita para stir-fry, salteados e frutos do mar. Alta durabilidade.', valor:120, fav:false },
+    { id:'utensilios',    cat:'cozinha', emoji:'🥄', nome:'Kit Utensílios de Silicone',      desc:'10 peças premium: espátulas, fouet, pincel e colheres até 230°C.', valor:110, fav:false },
+    { id:'facas',         cat:'cozinha', emoji:'🔪', nome:'Jogo de Facas Profissional',      desc:'5 facas em aço inox alemão + bloco de madeira elegante para guardar.', valor:250, fav:true  },
+    { id:'tabua',         cat:'cozinha', emoji:'🪵', nome:'Tábua de Corte em Bambu XL',      desc:'Bambu orgânico com ranhura e pés antiderrapantes. Grande e funcional.', valor:75,  fav:false },
+    { id:'escorredor',    cat:'cozinha', emoji:'🍝', nome:'Escorredor de Macarrão Inox',     desc:'Aço inox 18/10 com base e alças. 5L. Elegante e resistente.', valor:65,  fav:false },
+    { id:'formas',        cat:'cozinha', emoji:'🎂', nome:'Kit de Formas para Assar',        desc:'6 peças esmaltadas: assadeiras, forma de bolo, muffin e gratinar.', valor:130, fav:false },
+    { id:'potes',         cat:'cozinha', emoji:'🫙', nome:'Potes Herméticos de Vidro',       desc:'10 potes borossilicato com tampas herméticas. Elegantes e ecológicos.', valor:140, fav:false },
+    { id:'temperos',      cat:'cozinha', emoji:'🌿', nome:'Porta-Temperos Giratório',        desc:'Suporte de bambu com 12 frascos de vidro. Funcional e decorativo.', valor:90,  fav:false },
+    // ELETROS
+    { id:'airfryer',      cat:'eletros', emoji:'⚡', nome:'Air Fryer Digital 5L',            desc:'8 programas, display touch, temperatura até 200°C. Praticidade total.', valor:390, fav:true  },
+    { id:'liquidificador',cat:'eletros', emoji:'🥤', nome:'Liquidificador 1400W',            desc:'15 velocidades, jarra de vidro 2L, funções pulse e turbo.', valor:195, fav:false },
+    { id:'batedeira',     cat:'eletros', emoji:'🍰', nome:'Batedeira Planetária 750W',       desc:'12 velocidades, tigela inox 4,5L. Acessórios gancho, batedor e globo.', valor:360, fav:true  },
+    { id:'processador',   cat:'eletros', emoji:'🥬', nome:'Processador de Alimentos',        desc:'700W, 10 funções, 8 discos reversíveis, tigela 3,1L.', valor:270, fav:false },
+    { id:'cafeteira',     cat:'eletros', emoji:'☕', nome:'Cafeteira Espresso Automática',   desc:'Pressão 15 bar, vaporizador de leite, reservatório 1,8L.', valor:420, fav:true  },
+    { id:'chaleira',      cat:'eletros', emoji:'🫖', nome:'Chaleira Elétrica Inox',          desc:'1,7L, fervura rápida, base 360°. Elegante e prática.', valor:95,  fav:false },
+    { id:'sanduicheira',  cat:'eletros', emoji:'🥪', nome:'Grill e Sanduicheira',            desc:'Placas removíveis antiaderentes, termostato. Café da manhã perfeito.', valor:115, fav:false },
+    // MESA
+    { id:'jantar',        cat:'mesa',    emoji:'🍽️', nome:'Aparelho de Jantar 42 Peças',    desc:'Porcelana branca para 6 pessoas: pratos, xícaras e travessas.', valor:295, fav:true  },
+    { id:'cha-cafe',      cat:'mesa',    emoji:'☕', nome:'Aparelho de Chá e Café',          desc:'14 peças em porcelana fina com dourado: bule, leiteira e xícaras.', valor:195, fav:false },
+    { id:'tacas',         cat:'mesa',    emoji:'🥂', nome:'Jogo de Taças de Cristal',        desc:'12 taças borossilicato: 6 vinho tinto + 6 vinho branco.', valor:230, fav:true  },
+    { id:'copos',         cat:'mesa',    emoji:'🥛', nome:'Jogo de Copos Long Drink',        desc:'12 copos de vidro temperado 350ml para sucos e drinks.', valor:100, fav:false },
+    { id:'toalha-mesa',   cat:'mesa',    emoji:'🌸', nome:'Toalha de Mesa com Guardanapos', desc:'100% algodão egípcio 10 lugares + 12 guardanapos bordados.', valor:175, fav:false },
+    { id:'jogo-am',       cat:'mesa',    emoji:'🎨', nome:'Jogo Americano + Porta-Copos',   desc:'6 jogos em tecido + 6 porta-copos de bambu. Delicado e moderno.', valor:70,  fav:false },
+    { id:'galheteiro',    cat:'mesa',    emoji:'🧂', nome:'Galheteiro e Acessórios',        desc:'Saleiro, pimenteiro, paliteiro e porta-azeite em vidro com suporte inox.', valor:85,  fav:false },
+    // CASA
+    { id:'relogio',       cat:'casa',    emoji:'🕐', nome:'Relógio de Parede Minimalista',  desc:'Mecanismo silencioso, quadrante 40cm em madeira natural, estilo escandinavo.', valor:95, fav:false },
+    { id:'quadro',        cat:'casa',    emoji:'🖼️', nome:'Quadro Decorativo para Sala',   desc:'Canvas com moldura em madeira — arte botânica ou abstrata à escolha.', valor:130, fav:false },
+    { id:'vaso',          cat:'casa',    emoji:'🌺', nome:'Vaso Decorativo em Cerâmica',    desc:'Cerâmica artesanal esmaltada em tons neutros. Perfeito para plantas.', valor:85,  fav:false },
+    { id:'aromatizador',  cat:'casa',    emoji:'🕯️', nome:'Kit Velas Aromáticas',          desc:'3 velas de soja (baunilha, cedro e flor de algodão) em potes de vidro.', valor:120, fav:false },
+    { id:'organizadores', cat:'casa',    emoji:'🗂️', nome:'Kit Organizadores para Cozinha', desc:'Cestos de bambu, prateleiras e divisores de gaveta. Organização total.', valor:150, fav:false },
+    // BANHO
+    { id:'toalhas',       cat:'banho',   emoji:'🛁', nome:'Jogo de Toalhas de Banho',       desc:'6 peças 100% algodão egípcio 500g/m²: banho, rosto e piso.', valor:220, fav:true  },
+    { id:'cama',          cat:'banho',   emoji:'🛏️', nome:'Jogo de Cama King 300 Fios',     desc:'4 peças percal 300 fios. Macio, fresco e extremamente elegante.', valor:350, fav:true  },
+    { id:'roupao',        cat:'banho',   emoji:'🧖', nome:'Par de Roupões Casal',           desc:'100% algodão felpudo com bolsos e capuz. Conforto de spa em casa.', valor:180, fav:false },
+    { id:'acess-banho',   cat:'banho',   emoji:'🧴', nome:'Kit Acessórios de Banheiro',    desc:'5 peças em porcelana e bambu: saboneteira, porta-escova, dispenser e lixeira.', valor:140, fav:false },
+    { id:'panos',         cat:'banho',   emoji:'🌿', nome:'Jogo de Panos de Prato',         desc:'12 panos em linho e algodão, bordados à mão. Charme e funcionalidade.', valor:80,  fav:false },
+  ];
+
+  // ──────────────────────────────────────
+  // CORES POR CATEGORIA
+  // ──────────────────────────────────────
+  const CAT_COLORS = {
+    cozinha: { bg:'#f0faf0', border:'#bbf7d0', text:'#14743e', label:'Cozinha' },
+    eletros: { bg:'#eff6ff', border:'#bfdbfe', text:'#1e40af', label:'Eletrodomésticos' },
+    mesa:    { bg:'#fffbeb', border:'#fde68a', text:'#8a5a08', label:'Mesa e Sala' },
+    casa:    { bg:'#faf5ff', border:'#e9d5ff', text:'#7c22ce', label:'Casa e Decoração' },
+    banho:   { bg:'#fff1f2', border:'#fecdd3', text:'#be123c', label:'Banho e Enxoval' },
+  };
+
+  // ──────────────────────────────────────
+  // ESTADO
+  // ──────────────────────────────────────
+  let selecionado = null;
+  let catAtiva    = 'todos';
+
+  // ──────────────────────────────────────
+  // UTILS
+  // ──────────────────────────────────────
+  const fmt = (v) => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
+  const $ = (id) => document.getElementById(id);
+  const show = (id) => { $(id).style.display='flex'; document.body.style.overflow='hidden'; };
+  const hide = (id) => { $(id).style.display='none'; document.body.style.overflow=''; };
+  const setErr = (id, msg) => {
+    const el=$(id); el.textContent=msg; el.style.display='block';
+    setTimeout(()=>el.style.display='none',5000);
+  };
+  const setBtn = (btn, loading) => {
+    if(loading){ btn.disabled=true; btn._t=btn.innerHTML; btn.innerHTML='<span class="spinner"></span><span>Aguarde…</span>'; }
+    else { btn.disabled=false; btn.innerHTML=btn._t; }
+  };
+
+  // ──────────────────────────────────────
+  // RENDER CARDS
+  // ──────────────────────────────────────
+  const grid = $('gift-grid');
+
+  const render = (cat) => {
+    grid.innerHTML = '';
+    const list = cat==='todos' ? PRESENTES : PRESENTES.filter(p=>p.cat===cat);
+    if(!list.length){
+      grid.innerHTML=`<div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--n300);"><p style="font-size:2rem;margin-bottom:.5rem;">🌿</p><p>Nenhum presente nesta categoria.</p></div>`;
+      return;
+    }
+    list.forEach(p=>{
+      const c = CAT_COLORS[p.cat]||{bg:'#f9f9f9',border:'#e5e5e5',text:'#555',label:p.cat};
+      const el = document.createElement('article');
+      el.className = 'gift-card';
+      el.innerHTML = `
+        ${p.fav ? `<div class="fav-badge">✦ Favorito</div>` : ''}
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;${p.fav?'padding-top:1.6rem':''}">
+          <span style="font-size:2.1rem;line-height:1;">${p.emoji}</span>
+          <span class="valor-badge">${fmt(p.valor)}</span>
+        </div>
+        <div>
+          <span class="cat-tag" style="background:${c.bg};border:1px solid ${c.border};color:${c.text};margin-bottom:.5rem;">${c.label}</span>
+          <h3 style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:600;color:var(--s800);line-height:1.25;margin-top:.35rem;">${p.nome}</h3>
+          <p style="font-size:.76rem;color:var(--n400);line-height:1.65;margin-top:.35rem;">${p.desc}</p>
+        </div>
+        <button class="btn-presentear btn-gold"
+          data-nome="${p.nome}" data-valor="${p.valor}"
+          style="width:100%;margin-top:auto;padding:.72rem 1rem;font-size:.79rem;"
+          aria-label="Presentear com ${p.nome}">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+          </svg>
+          Presentear
+        </button>`;
+      grid.appendChild(el);
+    });
+  };
+
+  render('todos');
+
+  // ──────────────────────────────────────
+  // FILTROS
+  // ──────────────────────────────────────
+  document.getElementById('cat-filters').addEventListener('click', e=>{
+    const btn = e.target.closest('[data-cat]');
+    if(!btn) return;
+    document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    catAtiva = btn.dataset.cat;
+    render(catAtiva);
+  });
+
+  // ──────────────────────────────────────
+  // ABRIR MODAL PRESENTE
+  // ──────────────────────────────────────
+  document.addEventListener('click', e=>{
+    const btn = e.target.closest('.btn-presentear');
+    if(!btn) return;
+    selecionado = { nome:btn.dataset.nome, valor:parseFloat(btn.dataset.valor) };
+    $('modal-h2').textContent  = selecionado.nome;
+    $('modal-val').textContent = fmt(selecionado.valor);
+    $('modal-nome').value = '';
+    $('modal-msg').value  = '';
+    $('modal-erro').style.display = 'none';
+    show('modal-presente');
+    setTimeout(()=>$('modal-nome').focus(), 80);
+  });
+
+  $('btn-modal-close').addEventListener('click', ()=>hide('modal-presente'));
+  $('modal-bg').addEventListener('click', ()=>hide('modal-presente'));
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape'){ hide('modal-presente'); hide('modal-feedback'); }
+  });
+
+  // ──────────────────────────────────────
+  // PAGAMENTO
+  // ──────────────────────────────────────
+  const pagar = async ({itemNome,itemValor,guestName,mensagem,btnEl}) => {
+    setBtn(btnEl,true);
+    show('modal-loading');
+    try{
+      const res = await fetch('/api/criar-preferencia',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({itemNome,itemValor,guestName,mensagem}),
+      });
+      const data = await res.json();
+      hide('modal-loading');
+      if(!res.ok) throw new Error(data.error||'Erro desconhecido.');
+      // O init_point (checkoutUrl) é mais estável que o sandbox_init_point no MP
+      const url = data.checkoutUrl || data.sandboxUrl;
+      if(url) window.location.href=url;
+      else throw new Error('URL de checkout não retornada.');
+    } catch(err){
+      hide('modal-loading');
+      setBtn(btnEl,false);
+      feedback('erro','Algo deu errado 😔',err.message||'Não foi possível conectar. Tente novamente.');
+    }
+  };
+
+  $('form-modal').addEventListener('submit', async e=>{
+    e.preventDefault();
+    $('modal-erro').style.display='none';
+    const guestName=$('modal-nome').value.trim();
+    const mensagem =$('modal-msg').value.trim();
+    if(!guestName) return setErr('modal-erro','Por favor, informe seu nome.');
+    if(!selecionado) return setErr('modal-erro','Nenhum presente selecionado.');
+    hide('modal-presente');
+    await pagar({itemNome:selecionado.nome,itemValor:selecionado.valor,guestName,mensagem,btnEl:$('btn-modal-pay')});
+  });
+
+  $('form-livre').addEventListener('submit', async e=>{
+    e.preventDefault();
+    $('livre-erro').style.display='none';
+    const valorRaw = $('livre-valor').value.trim();
+    // Substitui vírgula por ponto e remove tudo que não for dígito ou ponto
+    let vLimpo = valorRaw.replace(/\./g, '').replace(',', '.');
+    const valor = parseFloat(vLimpo);
+
+    const guestName = $('livre-nome').value.trim();
+    const mensagem  = $('livre-msg').value.trim();
+
+    if(!valorRaw || isNaN(valor) || valor < 1) return setErr('livre-erro','Informe um valor válido (mínimo R$ 1,00).');
+    if(!guestName) return setErr('livre-erro','Por favor, informe seu nome.');
+    await pagar({itemNome:'Contribuição Livre',itemValor:valor,guestName,mensagem,btnEl:$('btn-livre')});
+  });
+
+  // ──────────────────────────────────────
+  // FEEDBACK MODAL
+  // ──────────────────────────────────────
+  const feedback = (tipo, titulo, msg) => {
+    const icons={sucesso:'🎉',erro:'😔',pendente:'⏳'};
+    $('fb-icon').textContent  = icons[tipo]||'✨';
+    $('fb-title').textContent = titulo;
+    $('fb-msg').textContent   = msg;
+    show('modal-feedback');
+  };
+  $('btn-fb-close').addEventListener('click',()=>hide('modal-feedback'));
+
+  // ──────────────────────────────────────
+  // RETORNO DO CHECKOUT
+  // ──────────────────────────────────────
+  const path   = window.location.pathname;
+  const params = new URLSearchParams(window.location.search);
+  if(path==='/sucesso'){
+    const item=params.get('item')||'seu presente', guest=params.get('guest')||'';
+    feedback('sucesso','Presente recebido! 🎊',`Que alegria${guest?', '+guest:''}! O presente "${item}" chegou com muito amor. Gabriela e Rodolfo agradecem de coração. 💚`);
+    history.replaceState(null,'','/');
+  } else if(path==='/falha'){
+    feedback('erro','Pagamento não concluído','O pagamento não foi processado. Verifique os dados e tente novamente. 💛');
+    history.replaceState(null,'','/');
+  } else if(path==='/pendente'){
+    feedback('pendente','Pagamento em análise ⏳','Assim que confirmado, o presente estará garantido!');
+    history.replaceState(null,'','/');
+  }
+})();
+</script>
+
+</body>
+</html>
