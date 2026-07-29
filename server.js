@@ -41,11 +41,14 @@ app.use(session({
 }));
 
 // ── Persistência de compras (JSON file) ───────────────────────
-const DATA_DIR  = path.join(__dirname, 'data');
+const isVercelEnv = process.env.VERCEL === '1' || process.env.VERCEL;
+const DATA_DIR  = isVercelEnv ? '/tmp' : path.join(__dirname, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'purchases.json');
 
-if (!fs.existsSync(DATA_DIR))  fs.mkdirSync(DATA_DIR, { recursive: true });
-if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '[]', 'utf8');
+if (!isVercelEnv) {
+  if (!fs.existsSync(DATA_DIR))  fs.mkdirSync(DATA_DIR, { recursive: true });
+  if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '[]', 'utf8');
+}
 
 const loadPurchases = () => {
   try { return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')); }
@@ -53,6 +56,7 @@ const loadPurchases = () => {
 };
 
 const savePurchases = (list) => {
+  if (isVercelEnv && !fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
   fs.writeFileSync(DATA_FILE, JSON.stringify(list, null, 2), 'utf8');
 };
 
@@ -336,10 +340,12 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Rota não encontrada.' });
 });
 
+const isVercel = process.env.VERCEL === '1' || process.env.VERCEL;
+
 // ----------------------------------------------------------------------
 // 8. Inicialização do Servidor (Local vs Vercel)
 // ----------------------------------------------------------------------
-if (require.main === module) {
+if (!isVercel) {
   app.listen(PORT, () => {
     console.log(`\n==========================================================`);
     console.log(`  🌿 Chá de Panela — Gabriela & Rodolfo`);
