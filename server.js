@@ -336,12 +336,18 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Rota não encontrada.' });
 });
 
-// ── Start ─────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log('='.repeat(58));
-  console.log('  🌿 Chá de Panela — Gabriela & Rodolfo');
-  console.log(`  🚀 Servidor: http://localhost:${PORT}`);
-  console.log(`  🔐 Admin:    http://localhost:${PORT}/admin`);
-  console.log(`  💳 MP Token: ${process.env.MERCADO_PAGO_ACCESS_TOKEN ? '✅ Configurado' : '⚠️  Não definido'}`);
-  console.log('='.repeat(58));
-});
+// ----------------------------------------------------------------------
+// 8. Inicialização do Servidor (Local vs Vercel)
+// ----------------------------------------------------------------------
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`\n==========================================================`);
+    console.log(`  🌿 Chá de Panela — Gabriela & Rodolfo`);
+    console.log(`  🚀 Servidor: http://localhost:${PORT}`);
+    console.log(`  🔐 Admin:    http://localhost:${PORT}/admin`);
+    console.log(`  💳 MP Token: ${process.env.MERCADO_PAGO_ACCESS_TOKEN ? '✅ Configurado' : '⚠️  Não definido'}`);
+    console.log(`==========================================================\n`);
+  });
+}
+
+module.exports = app;
