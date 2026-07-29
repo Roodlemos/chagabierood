@@ -287,6 +287,18 @@
 
 <body>
 
+<!-- ═══════════ NAV MENU ═══════════ -->
+<nav style="position:fixed;top:0;left:0;right:0;z-index:40;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:rgba(255,255,255,0.85);border-bottom:1px solid rgba(0,0,0,0.05);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 4px 30px rgba(0,0,0,0.03);">
+  <div style="font-family:'Dancing Script',cursive;font-size:1.6rem;font-weight:600;color:var(--s800);cursor:pointer;" onclick="window.scrollTo({top:0,behavior:'smooth'})">G&R</div>
+  <div style="display:flex;gap:1rem;align-items:center;">
+    <a href="#lista" style="font-size:0.75rem;font-weight:600;color:var(--s700);text-transform:uppercase;letter-spacing:0.1em;text-decoration:none;">Lista de Presentes</a>
+    <button id="btn-nav-rsvp" class="btn-sage" style="padding:0.6rem 1rem;font-size:0.75rem;display:inline-flex;align-items:center;gap:0.3rem;">
+      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      Confirmar Presença
+    </button>
+  </div>
+</nav>
+
 <!-- ═══════════ HERO ═══════════ -->
 <header class="hero">
   <!-- Folhas decorativas -->
@@ -300,7 +312,7 @@
     <circle cx="50" cy="50" r="45"/>
   </svg>
 
-  <div style="position:relative;z-index:10;max-width:760px;margin:0 auto;padding:5.5rem 1.5rem 5rem;text-align:center;">
+  <div style="position:relative;z-index:10;max-width:760px;margin:0 auto;padding:8rem 1.5rem 5rem;text-align:center;">
 
     <!-- Ícone flutuante -->
     <div class="float" style="display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);margin-bottom:2rem;font-size:1.6rem;">
@@ -358,25 +370,6 @@
   </div>
 </header>
 
-<!-- ═══════════ RSVP ═══════════ -->
-<section id="rsvp" style="background:var(--blush);padding:5rem 1.25rem;text-align:center;">
-  <div style="max-width:600px;margin:0 auto;background:#fff;border-radius:24px;padding:3.5rem 2rem;box-shadow:var(--shadow-card);">
-    <p style="font-size:.65rem;font-weight:600;letter-spacing:.25em;text-transform:uppercase;color:var(--g600);margin-bottom:.6rem;">Confirme sua Presença</p>
-    <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,6vw,2.8rem);font-weight:400;color:var(--s800);margin-bottom:1rem;line-height:1.1;">
-      Você vai celebrar conosco?
-    </h2>
-    <p style="font-size:.85rem;color:var(--n400);margin-bottom:2rem;line-height:1.6;font-weight:300;">
-      Por favor, confirme sua presença até o dia 20 de Julho para que possamos preparar tudo com muito carinho.
-    </p>
-
-    <div style="text-align:center;">
-      <button id="btn-open-rsvp" class="btn-sage" style="padding:1rem 2rem;font-size:1rem;display:inline-flex;align-items:center;gap:.5rem;">
-        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Confirmar Presença
-      </button>
-    </div>
-  </div>
-</section>
 
 <!-- ═══════════ MODAL RSVP ═══════════ -->
 <div id="modal-rsvp" style="position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:1rem;display:none;" role="dialog" aria-modal="true">
@@ -754,12 +747,18 @@
   // ──────────────────────────────────────
   // ABRIR MODAL RSVP
   // ──────────────────────────────────────
-  $('btn-open-rsvp').addEventListener('click', () => {
+  const openRsvpModal = () => {
     $('form-rsvp').reset();
     $('companions-list').innerHTML = ''; // Limpa acompanhantes
     $('rsvp-erro').style.display = 'none';
     show('modal-rsvp');
-  });
+  };
+
+  const btnOpenRsvp = $('btn-open-rsvp');
+  if(btnOpenRsvp) btnOpenRsvp.addEventListener('click', openRsvpModal);
+  
+  const btnNavRsvp = $('btn-nav-rsvp');
+  if(btnNavRsvp) btnNavRsvp.addEventListener('click', openRsvpModal);
   
   $('btn-modal-rsvp-close').addEventListener('click', () => hide('modal-rsvp'));
   $('modal-rsvp-bg').addEventListener('click', () => hide('modal-rsvp'));
