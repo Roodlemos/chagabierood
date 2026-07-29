@@ -760,7 +760,10 @@
           <td class="td-name">${escHtml(g.name)}</td>
           <td>${escHtml(g.phone || '—')}</td>
           <td>${g.isAttending ? '<span class="badge badge-approved">✅ Confirmado</span>' : '<span class="badge badge-rejected">❌ Não vai</span>'}</td>
-          <td>+${g.guestsCount || 0}</td>
+          <td>
+            +${g.guestsCount || 0}
+            ${g.companions && g.companions.length > 0 ? `<div style="font-size:0.7rem;color:var(--warm-500);margin-top:0.2rem;line-height:1.4;">${g.companions.map(escHtml).join(', ')}</div>` : ''}
+          </td>
           <td class="td-msg" title="${escHtml(g.notes)}">${escHtml(g.notes)}</td>
           <td class="td-actions">
             <button class="btn-action delete" data-id="${g.id}" data-action="delete-guest">🗑</button>

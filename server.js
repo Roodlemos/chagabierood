@@ -236,7 +236,7 @@ app.post('/api/webhook', async (req, res) => {
 
 // ── POST /api/rsvp ────────────────────────────────────────────
 app.post('/api/rsvp', (req, res) => {
-  const { name, phone, guestsCount, isAttending, notes } = req.body;
+  const { name, phone, guestsCount, companions, isAttending, notes } = req.body;
   if (!name || String(name).trim() === '') return res.status(400).json({ error: 'Nome é obrigatório.' });
 
   const guests = loadGuests();
@@ -245,6 +245,7 @@ app.post('/api/rsvp', (req, res) => {
     name: String(name).trim(),
     phone: phone ? String(phone).trim() : '',
     guestsCount: Number(guestsCount) || 0,
+    companions: Array.isArray(companions) ? companions : [],
     isAttending: isAttending === true || isAttending === 'true',
     notes: notes ? String(notes).trim() : '',
     createdAt: new Date().toISOString()

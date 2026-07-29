@@ -369,51 +369,82 @@
       Por favor, confirme sua presença até o dia 20 de Julho para que possamos preparar tudo com muito carinho.
     </p>
 
-    <form id="form-rsvp" novalidate style="text-align:left;display:flex;flex-direction:column;gap:1.25rem;">
-      <div>
-        <label class="field-label" for="rsvp-nome">Nome Completo *</label>
-        <input id="rsvp-nome" type="text" placeholder="Ex: Maria da Silva" class="inp" required/>
+    <div style="text-align:center;">
+      <button id="btn-open-rsvp" class="btn-sage" style="padding:1rem 2rem;font-size:1rem;display:inline-flex;align-items:center;gap:.5rem;">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Confirmar Presença
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ MODAL RSVP ═══════════ -->
+<div id="modal-rsvp" style="position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:1rem;display:none;" role="dialog" aria-modal="true">
+  <div class="overlay" id="modal-rsvp-bg" style="position:absolute;inset:0;"></div>
+  <div class="modal-card" style="position:relative;background:#fff;border-radius:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.35);">
+    <div style="padding:1.75rem 1.75rem 2rem;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem;">
+        <div>
+          <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:600;color:var(--s800);line-height:1.2;">Confirmação</h2>
+        </div>
+        <button id="btn-modal-rsvp-close" style="color:var(--n300);padding:.4rem;border-radius:9px;border:none;background:none;cursor:pointer;transition:color .2s,background .2s;flex-shrink:0;margin-top:-.2rem;" aria-label="Fechar">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
       </div>
-      
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;">
+
+      <form id="form-rsvp" novalidate style="display:flex;flex-direction:column;gap:1.25rem;">
+        <div>
+          <label class="field-label">Você poderá comparecer? *</label>
+          <div style="display:flex;gap:1rem;margin-top:.3rem;">
+            <label style="flex:1;cursor:pointer;">
+              <input type="radio" name="rsvp-presenca" value="true" checked style="display:none;"/>
+              <div class="rsvp-radio btn-sim" style="border:1.5px solid var(--n200);border-radius:12px;padding:.8rem;text-align:center;font-size:.85rem;font-weight:500;color:var(--n500);transition:all .2s;">
+                Sim, estarei lá!
+              </div>
+            </label>
+            <label style="flex:1;cursor:pointer;">
+              <input type="radio" name="rsvp-presenca" value="false" style="display:none;"/>
+              <div class="rsvp-radio btn-nao" style="border:1.5px solid var(--n200);border-radius:12px;padding:.8rem;text-align:center;font-size:.85rem;font-weight:500;color:var(--n500);transition:all .2s;">
+                Não poderei ir
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="field-label" for="rsvp-nome">Seu Nome Completo *</label>
+          <input id="rsvp-nome" type="text" placeholder="Ex: Maria da Silva" class="inp" required/>
+        </div>
+        
         <div>
           <label class="field-label" for="rsvp-telefone">WhatsApp</label>
           <input id="rsvp-telefone" type="tel" placeholder="(00) 00000-0000" class="inp"/>
         </div>
+
+        <div id="rsvp-acompanhantes-wrapper">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.45rem;">
+            <label class="field-label" style="margin-bottom:0;">Acompanhantes</label>
+            <button type="button" id="btn-add-companion" style="background:none;border:none;color:var(--s600);font-size:.75rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.25rem;">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Adicionar nome
+            </button>
+          </div>
+          <div id="companions-list" style="display:flex;flex-direction:column;gap:.5rem;">
+            <!-- Companions dinâmicos aqui -->
+          </div>
+        </div>
+
         <div>
-          <label class="field-label" for="rsvp-acompanhantes">Nº de Acompanhantes</label>
-          <input id="rsvp-acompanhantes" type="number" min="0" max="10" placeholder="0" class="inp"/>
+          <label class="field-label" for="rsvp-msg">Alguma observação?</label>
+          <textarea id="rsvp-msg" rows="2" placeholder="Restrições alimentares, recados..." class="inp"></textarea>
         </div>
-      </div>
 
-      <div>
-        <label class="field-label">Você poderá comparecer? *</label>
-        <div style="display:flex;gap:1rem;margin-top:.3rem;">
-          <label style="flex:1;cursor:pointer;">
-            <input type="radio" name="rsvp-presenca" value="true" checked style="display:none;"/>
-            <div class="rsvp-radio btn-sim" style="border:1.5px solid var(--n200);border-radius:12px;padding:.8rem;text-align:center;font-size:.85rem;font-weight:500;color:var(--n500);transition:all .2s;">
-              Sim, estarei lá!
-            </div>
-          </label>
-          <label style="flex:1;cursor:pointer;">
-            <input type="radio" name="rsvp-presenca" value="false" style="display:none;"/>
-            <div class="rsvp-radio btn-nao" style="border:1.5px solid var(--n200);border-radius:12px;padding:.8rem;text-align:center;font-size:.85rem;font-weight:500;color:var(--n500);transition:all .2s;">
-              Não poderei ir
-            </div>
-          </label>
-        </div>
-      </div>
-
-      <div>
-        <label class="field-label" for="rsvp-msg">Alguma observação?</label>
-        <textarea id="rsvp-msg" rows="2" placeholder="Restrições alimentares, recados..." class="inp"></textarea>
-      </div>
-
-      <button id="btn-rsvp-submit" type="submit" class="btn-sage" style="width:100%;margin-top:.5rem;padding:1rem;">
-        Enviar Confirmação
-      </button>
-      <p id="rsvp-erro" style="color:#b91c1c;font-size:.75rem;display:none;text-align:center;"></p>
-    </form>
+        <p id="rsvp-erro" style="color:#b91c1c;font-size:.75rem;display:none;text-align:center;"></p>
+        <button id="btn-rsvp-submit" type="submit" class="btn-sage" style="width:100%;margin-top:.5rem;padding:1rem;">
+          Confirmar
+        </button>
+      </form>
+    </div>
   </div>
 </section>
 
@@ -747,8 +778,22 @@
 
   $('btn-modal-close').addEventListener('click', ()=>hide('modal-presente'));
   $('modal-bg').addEventListener('click', ()=>hide('modal-presente'));
+
+  // ──────────────────────────────────────
+  // ABRIR MODAL RSVP
+  // ──────────────────────────────────────
+  $('btn-open-rsvp').addEventListener('click', () => {
+    $('form-rsvp').reset();
+    $('companions-list').innerHTML = ''; // Limpa acompanhantes
+    $('rsvp-erro').style.display = 'none';
+    show('modal-rsvp');
+  });
+  
+  $('btn-modal-rsvp-close').addEventListener('click', () => hide('modal-rsvp'));
+  $('modal-rsvp-bg').addEventListener('click', () => hide('modal-rsvp'));
+
   document.addEventListener('keydown', e=>{
-    if(e.key==='Escape'){ hide('modal-presente'); hide('modal-feedback'); }
+    if(e.key==='Escape'){ hide('modal-presente'); hide('modal-feedback'); hide('modal-rsvp'); }
   });
 
   // ──────────────────────────────────────
@@ -835,18 +880,50 @@
   // ──────────────────────────────────────
   // RSVP HANDLER
   // ──────────────────────────────────────
+  const companionsList = $('companions-list');
+  $('btn-add-companion').addEventListener('click', () => {
+    const div = document.createElement('div');
+    div.style.display = 'flex';
+    div.style.gap = '.5rem';
+    div.innerHTML = `
+      <input type="text" placeholder="Nome do acompanhante" class="inp inp-companion" style="flex:1;" required/>
+      <button type="button" onclick="this.parentElement.remove()" style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:12px;padding:0 .75rem;cursor:pointer;" aria-label="Remover">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    `;
+    companionsList.appendChild(div);
+  });
+
   const formRsvp = $('form-rsvp');
   if (formRsvp) {
+    // Show/hide companions section based on attending status
+    document.querySelectorAll('input[name="rsvp-presenca"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        if(e.target.value === 'false') {
+          $('rsvp-acompanhantes-wrapper').style.display = 'none';
+        } else {
+          $('rsvp-acompanhantes-wrapper').style.display = 'block';
+        }
+      });
+    });
+
     formRsvp.addEventListener('submit', async e => {
       e.preventDefault();
       $('rsvp-erro').style.display = 'none';
       const nome = $('rsvp-nome').value.trim();
       const telefone = $('rsvp-telefone').value.trim();
-      const guestsCount = $('rsvp-acompanhantes').value.trim();
+      
       const isAttending = document.querySelector('input[name="rsvp-presenca"]:checked').value;
       const notes = $('rsvp-msg').value.trim();
 
       if (!nome) return setErr('rsvp-erro', 'Por favor, informe seu nome.');
+
+      // Collect companions
+      const companionInputs = document.querySelectorAll('.inp-companion');
+      const companions = [];
+      companionInputs.forEach(inp => {
+        if(inp.value.trim()) companions.push(inp.value.trim());
+      });
 
       const btnEl = $('btn-rsvp-submit');
       setBtn(btnEl, true);
@@ -855,14 +932,20 @@
         const res = await fetch('/api/rsvp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: nome, phone: telefone, guestsCount, isAttending, notes })
+          body: JSON.stringify({ 
+            name: nome, 
+            phone: telefone, 
+            guestsCount: isAttending === 'true' ? companions.length : 0, 
+            companions: isAttending === 'true' ? companions : [],
+            isAttending, 
+            notes 
+          })
         });
         const data = await res.json();
         setBtn(btnEl, false);
         if (!res.ok) throw new Error(data.error || 'Erro ao enviar confirmação.');
         
-        // Limpar form e dar feedback
-        formRsvp.reset();
+        hide('modal-rsvp');
         feedback('sucesso', 'Confirmação Enviada!', isAttending === 'true' ? 'Que maravilha! Mal podemos esperar para celebrar com você.' : 'Poxa, sentiremos sua falta, mas agradecemos por avisar!');
       } catch (err) {
         setBtn(btnEl, false);
