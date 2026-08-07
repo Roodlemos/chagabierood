@@ -9,6 +9,11 @@ const express  = require('express');
 const session  = require('express-session');
 const path     = require('path');
 const fs       = require('fs');
+const helmet   = require('helmet');
+const rateLimit = require('express-rate-limit');
+const bcrypt   = require('bcryptjs');
+const crypto   = require('crypto');
+const { body, validationResult } = require('express-validator');
 const { MercadoPagoConfig, Preference, Payment } = require('mercadopago');
 
 // ── Mercado Pago ─────────────────────────────────────────────
@@ -24,6 +29,24 @@ const app      = express();
 const PORT     = process.env.PORT     || 3000;
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 
+// ── Segurança: Headers (Helmet) ───────────────────────────────
+app.use(helmet({
+  contentSecurityPolicy: false // Desativado para permitir assets externos (como Tailwind CDN e fontes do Google)
+}));
+
+// ── Segurança: Rate Limiting ──────────────────────────────────
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // Limite de 100 requisições por IP
+  message: { error: "Muitas requisições, tente novamente mais tarde." }
+});
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 5, // Limite de 5 tentativas de login por IP
+  message: "Muitas tentativas de login, tente novamente em 15 minutos."
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -37,16 +60,24 @@ app.use(session({
     maxAge:   1000 * 60 * 60 * 8,  // 8 horas
     httpOnly: true,
     sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production' // true se estiver em produção (HTTPS)
   },
 }));
 
-// ── Persistência de compras (JSON file) ───────────────────────
+// ── Persistência (SQLite) ─────────────────────────────────────────
+const Database = require('better-sqlite3');
 const isVercelEnv = process.env.VERCEL === '1' || process.env.VERCEL;
 const DATA_DIR  = isVercelEnv ? '/tmp' : path.join(__dirname, 'data');
-const DATA_FILE = path.join(DATA_DIR, 'purchases.json');
-const GUESTS_FILE = path.join(DATA_DIR, 'guests.json');
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
-const GIFTS_FILE = path.join(DATA_DIR, 'gifts.json');
+const DB_FILE = path.join(DATA_DIR, 'database.sqlite');
+const db = new Database(DB_FILE);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS gifts (id TEXT PRIMARY KEY, cat TEXT, emoji TEXT, nome TEXT, desc TEXT, valor REAL, fav INTEGER);
+  CREATE TABLE IF NOT EXISTS guests (id TEXT PRIMARY KEY, name TEXT, companions TEXT, guestsCount INTEGER, createdAt TEXT);
+  CREATE TABLE IF NOT EXISTS purchases (id TEXT PRIMARY KEY, payerName TEXT, giftId TEXT, giftName TEXT, valor REAL, pixCode TEXT, status TEXT, createdAt TEXT);
+`);
 
 const DEFAULT_GIFTS = [
   { id:'panelas', cat:'cozinha', emoji:'🍳', nome:'Jogo de Panelas Antiaderente', desc:'5 peças premium com tampa de vidro, compatível com indução e fogão a gás.', valor:80, fav:false },
@@ -54,41 +85,152 @@ const DEFAULT_GIFTS = [
   { id:'jantar', cat:'mesa', emoji:'🍽️', nome:'Aparelho de Jantar 42 Peças', desc:'Porcelana branca para 6 pessoas: pratos, xícaras e travessas.', valor:75, fav:true }
 ];
 
-if (!isVercelEnv) {
-  if (!fs.existsSync(DATA_DIR))  fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '[]', 'utf8');
-  if (!fs.existsSync(GUESTS_FILE)) fs.writeFileSync(GUESTS_FILE, '[]', 'utf8');
-  if (!fs.existsSync(GIFTS_FILE)) fs.writeFileSync(GIFTS_FILE, JSON.stringify(DEFAULT_GIFTS, null, 2), 'utf8');
+// Migração de JSON para SQLite
+const migrateFromJSON = () => {
+  const GIFTS_FILE = path.join(DATA_DIR, 'gifts.json');
+  const GUESTS_FILE = path.join(DATA_DIR, 'guests.json');
+  const DATA_FILE = path.join(DATA_DIR, 'purchases.json');
+
+  if (fs.existsSync(GIFTS_FILE)) {
+    try {
+      const gifts = JSON.parse(fs.readFileSync(GIFTS_FILE, 'utf8'));
+      const insert = db.prepare('INSERT OR IGNORE INTO gifts (id, cat, emoji, nome, desc, valor, fav) VALUES (?, ?, ?, ?, ?, ?, ?)');
+      db.transaction((items) => {
+        for (const item of items) insert.run(item.id, item.cat, item.emoji || '🎁', item.nome, item.desc || '', parseFloat(item.valor) || 0, item.fav ? 1 : 0);
+      })(gifts);
+      fs.renameSync(GIFTS_FILE, GIFTS_FILE + '.bak');
+    } catch(e) {}
+  } else {
+    const count = db.prepare('SELECT count(*) as c FROM gifts').get().c;
+    if (count === 0) {
+      const insert = db.prepare('INSERT INTO gifts (id, cat, emoji, nome, desc, valor, fav) VALUES (?, ?, ?, ?, ?, ?, ?)');
+      db.transaction((items) => {
+        for (const item of items) insert.run(item.id, item.cat, item.emoji || '🎁', item.nome, item.desc || '', parseFloat(item.valor) || 0, item.fav ? 1 : 0);
+      })(DEFAULT_GIFTS);
+    }
+  }
+
+  if (fs.existsSync(GUESTS_FILE)) {
+    try {
+      const guests = JSON.parse(fs.readFileSync(GUESTS_FILE, 'utf8'));
+      const insert = db.prepare('INSERT OR IGNORE INTO guests (id, name, companions, guestsCount, createdAt) VALUES (?, ?, ?, ?, ?)');
+      db.transaction((items) => {
+        for (const item of items) insert.run(item.id, item.name, JSON.stringify(item.companions || []), parseInt(item.guestsCount) || 0, item.createdAt);
+      })(guests);
+      fs.renameSync(GUESTS_FILE, GUESTS_FILE + '.bak');
+    } catch(e) {}
+  }
+
+  if (fs.existsSync(DATA_FILE)) {
+    try {
+      const purchases = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+      const insert = db.prepare('INSERT OR IGNORE INTO purchases (id, payerName, giftId, giftName, valor, pixCode, status, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+      db.transaction((items) => {
+        for (const item of items) insert.run(item.id, item.payerName, item.giftId, item.giftName, parseFloat(item.valor) || 0, item.pixCode || '', item.status || 'pending', item.createdAt);
+      })(purchases);
+      fs.renameSync(DATA_FILE, DATA_FILE + '.bak');
+    } catch(e) {}
+  }
+};
+migrateFromJSON();
+
+// ── Criptografia de Dados (AES-256-CBC) ────────────────────────
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
+const IV_LENGTH = 16;
+
+function encrypt(text) {
+  if (!text) return text;
+  try {
+    let iv = crypto.randomBytes(IV_LENGTH);
+    let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY, 'hex').slice(0, 32), iv);
+    let encrypted = cipher.update(String(text));
+    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    return iv.toString('hex') + ':' + encrypted.toString('hex');
+  } catch(e) { return text; }
 }
 
+function decrypt(text) {
+  if (!text || typeof text !== 'string' || !text.includes(':')) return text;
+  try {
+    let textParts = text.split(':');
+    if (textParts[0].length !== 32) return text; // IV length check
+    let iv = Buffer.from(textParts.shift(), 'hex');
+    let encryptedText = Buffer.from(textParts.join(':'), 'hex');
+    let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY, 'hex').slice(0, 32), iv);
+    let decrypted = decipher.update(encryptedText);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    return decrypted.toString();
+  } catch (e) { return text; }
+}
+
+const notifyAdmin = () => {
+  if (global.adminClients) {
+    global.adminClients.forEach(client => client.write(`event: update\ndata: {}\n\n`));
+  }
+};
+
 const loadPurchases = () => {
-  try { return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')); }
-  catch { return []; }
+  return db.prepare('SELECT * FROM purchases').all().map(p => ({
+    ...p,
+    payerName: decrypt(p.payerName),
+    payerEmail: p.payerEmail ? decrypt(p.payerEmail) : null,
+    pixCode: p.pixCode ? decrypt(p.pixCode) : ''
+  }));
 };
 
 const savePurchases = (list) => {
-  if (isVercelEnv && !fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(DATA_FILE, JSON.stringify(list, null, 2), 'utf8');
+  const insert = db.prepare('INSERT INTO purchases (id, payerName, giftId, giftName, valor, pixCode, status, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+  db.transaction((items) => {
+    db.prepare('DELETE FROM purchases').run();
+    for (const item of items) {
+      insert.run(
+        item.id,
+        encrypt(item.payerName),
+        item.giftId,
+        item.giftName,
+        parseFloat(item.valor) || 0,
+        item.pixCode ? encrypt(item.pixCode) : '',
+        item.status || 'pending',
+        item.createdAt
+      );
+    }
+  })(list);
+  notifyAdmin();
 };
 
 const loadGuests = () => {
-  try { return JSON.parse(fs.readFileSync(GUESTS_FILE, 'utf8')); }
-  catch { return []; }
+  return db.prepare('SELECT * FROM guests').all().map(g => ({
+    ...g,
+    name: decrypt(g.name),
+    companions: JSON.parse(decrypt(g.companions) || '[]')
+  }));
 };
 
 const saveGuests = (list) => {
-  if (isVercelEnv && !fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(GUESTS_FILE, JSON.stringify(list, null, 2), 'utf8');
+  const insert = db.prepare('INSERT INTO guests (id, name, companions, guestsCount, createdAt) VALUES (?, ?, ?, ?, ?)');
+  db.transaction((items) => {
+    db.prepare('DELETE FROM guests').run();
+    for (const item of items) {
+      insert.run(
+        item.id,
+        encrypt(item.name),
+        encrypt(JSON.stringify(item.companions || [])),
+        parseInt(item.guestsCount) || 0,
+        item.createdAt
+      );
+    }
+  })(list);
+  notifyAdmin();
 };
 
-const loadGifts = () => {
-  try { return JSON.parse(fs.readFileSync(GIFTS_FILE, 'utf8')); }
-  catch { return DEFAULT_GIFTS; }
-};
-
+const loadGifts = () => db.prepare('SELECT * FROM gifts').all().map(g => ({...g, fav: g.fav === 1}));
 const saveGifts = (list) => {
-  if (isVercelEnv && !fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-  fs.writeFileSync(GIFTS_FILE, JSON.stringify(list, null, 2), 'utf8');
+  const insert = db.prepare('INSERT INTO gifts (id, cat, emoji, nome, desc, valor, fav) VALUES (?, ?, ?, ?, ?, ?, ?)');
+  db.transaction((items) => {
+    db.prepare('DELETE FROM gifts').run();
+    for (const item of items) insert.run(item.id, item.cat, item.emoji || '🎁', item.nome, item.desc || '', parseFloat(item.valor) || 0, item.fav ? 1 : 0);
+  })(list);
+  notifyAdmin();
 };
 
 // ── Middleware de log ─────────────────────────────────────────
@@ -123,23 +265,25 @@ app.get('/api/gifts', (req, res) => {
 });
 
 // ── POST /api/criar-preferencia ───────────────────────────────
-app.post('/api/criar-preferencia', async (req, res) => {
+app.post('/api/criar-preferencia', apiLimiter, [
+  body('itemNome').trim().escape().notEmpty().withMessage("O campo 'itemNome' é obrigatório."),
+  body('itemValor').isFloat({ min: 1 }).withMessage("O valor deve ser maior que R$ 1,00."),
+  body('guestName').trim().escape().notEmpty().withMessage("O campo 'Seu Nome' é obrigatório."),
+  body('mensagem').optional().trim().escape()
+], async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ error: errors.array()[0].msg });
+    }
+
     const { itemNome, itemValor, guestName, mensagem } = req.body;
 
-    // Validação
-    if (!itemNome || String(itemNome).trim() === '')
-      return res.status(400).json({ error: "O campo 'itemNome' é obrigatório." });
-    if (!itemValor || isNaN(Number(itemValor)) || Number(itemValor) < 1)
-      return res.status(400).json({ error: 'O valor deve ser maior que R$ 1,00.' });
-    if (!guestName || String(guestName).trim() === '')
-      return res.status(400).json({ error: "O campo 'Seu Nome' é obrigatório." });
-
     const valor            = parseFloat(Number(itemValor).toFixed(2));
-    const nomeItem         = String(itemNome).trim();
-    const nomePresenteador = String(guestName).trim();
-    const msgCarinho       = (mensagem || '').trim();
-    const extRef           = `cha-panela-${Date.now()}-${nomePresenteador.replace(/\s+/g, '_').toLowerCase()}`;
+    const nomeItem         = String(itemNome);
+    const nomePresenteador = String(guestName);
+    const msgCarinho       = String(mensagem || '');
+    const extRef           = `cha-panela-${Date.now()}-${nomePresenteador.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}`;
     const isLocalhost      = BASE_URL.includes('localhost') || BASE_URL.includes('127.0.0.1');
 
     const preferenceData = {
@@ -259,19 +403,29 @@ app.post('/api/webhook', async (req, res) => {
 });
 
 // ── POST /api/rsvp ────────────────────────────────────────────
-app.post('/api/rsvp', (req, res) => {
+app.post('/api/rsvp', apiLimiter, [
+  body('name').trim().escape().notEmpty().withMessage("Nome é obrigatório."),
+  body('phone').optional().trim().escape(),
+  body('guestsCount').optional().isInt(),
+  body('companions.*').optional().trim().escape(),
+  body('notes').optional().trim().escape()
+], (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ error: errors.array()[0].msg });
+  }
+
   const { name, phone, guestsCount, companions, isAttending, notes } = req.body;
-  if (!name || String(name).trim() === '') return res.status(400).json({ error: 'Nome é obrigatório.' });
 
   const guests = loadGuests();
   guests.push({
     id: `rsvp-${Date.now()}`,
-    name: String(name).trim(),
-    phone: phone ? String(phone).trim() : '',
+    name: String(name),
+    phone: String(phone || ''),
     guestsCount: Number(guestsCount) || 0,
     companions: Array.isArray(companions) ? companions : [],
     isAttending: isAttending === true || isAttending === 'true',
-    notes: notes ? String(notes).trim() : '',
+    notes: String(notes || ''),
     createdAt: new Date().toISOString()
   });
 
@@ -296,24 +450,55 @@ app.get('/admin/login', (req, res) => {
 });
 
 // POST /admin/login — autenticação
-app.post('/admin/login', (req, res) => {
+app.post('/admin/login', loginLimiter, (req, res) => {
   const { username, password } = req.body;
   const ADMIN_USER = process.env.ADMIN_USER     || 'admin';
   const ADMIN_PASS = process.env.ADMIN_PASSWORD || 'cha2026';
 
-  if (username === ADMIN_USER && password === ADMIN_PASS) {
+  let match = false;
+  // Se a senha na env for um hash bcrypt (começa com $2a$ ou $2b$)
+  if (ADMIN_PASS.startsWith('$2a$') || ADMIN_PASS.startsWith('$2b$')) {
+    match = bcrypt.compareSync(password || '', ADMIN_PASS);
+  } else {
+    // Backwards compatibility para senhas planas
+    // Em produção real, recomende sempre gerar e salvar o hash na env
+    match = (password === ADMIN_PASS);
+  }
+
+  if (username === ADMIN_USER && match) {
     req.session.isAdmin   = true;
     req.session.loginTime = new Date().toISOString();
     return res.redirect('/admin/dashboard');
   }
 
-  console.warn(`[Admin] Tentativa de login inválida: user="${username}"`);
+  console.warn(`[Admin] Tentativa de login inválida: user="${username}" | IP: ${req.ip}`);
   res.redirect('/admin/login?error=1');
 });
 
 // GET /admin/dashboard — painel protegido
 app.get('/admin/dashboard', requireAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
+});
+
+// GET /admin/api/stream — conexão persistente (SSE) com timeout de 5 minutos
+global.adminClients = [];
+app.get('/admin/api/stream', requireAdmin, (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  
+  res.write('data: {"connected": true}\n\n');
+  global.adminClients.push(res);
+  
+  // Timeout de 5 minutos
+  const timer = setTimeout(() => {
+    res.end();
+  }, 5 * 60 * 1000);
+
+  req.on('close', () => {
+    clearTimeout(timer);
+    global.adminClients = global.adminClients.filter(c => c !== res);
+  });
 });
 
 // GET /admin/api/purchases — dados JSON para o dashboard
@@ -370,22 +555,6 @@ app.delete('/admin/api/purchases/:id', requireAdmin, (req, res) => {
   res.json({ ok: true });
 });
 
-// PATCH /admin/api/purchases/:id/status — atualiza status manualmente
-app.patch('/admin/api/purchases/:id/status', requireAdmin, (req, res) => {
-  const { status } = req.body;
-  const allowed = ['approved', 'pending', 'rejected', 'cancelled'];
-  if (!allowed.includes(status))
-    return res.status(400).json({ error: 'Status inválido.' });
-
-  const purchases = loadPurchases();
-  const idx = purchases.findIndex(p => p.id === req.params.id);
-  if (idx < 0) return res.status(404).json({ error: 'Registro não encontrado.' });
-
-  purchases[idx].status    = status;
-  purchases[idx].updatedAt = new Date().toISOString();
-  savePurchases(purchases);
-  res.json(purchases[idx]);
-});
 
 // GET /admin/api/guests — lista de convidados para o dashboard
 app.get('/admin/api/guests', requireAdmin, (req, res) => {
@@ -422,6 +591,28 @@ app.post('/admin/api/gifts', requireAdmin, (req, res) => {
     valor: parseFloat(valor),
     fav: fav === true || fav === 'true'
   });
+  saveGifts(gifts);
+  res.json({ ok: true });
+});
+
+// PUT /admin/api/gifts/:id — edita um presente
+app.put('/admin/api/gifts/:id', requireAdmin, (req, res) => {
+  const { cat, emoji, nome, desc, valor, fav } = req.body;
+  if (!nome || !valor || !cat) return res.status(400).json({ error: 'Dados incompletos.' });
+
+  const gifts = loadGifts();
+  const idx = gifts.findIndex(g => g.id === req.params.id);
+  if (idx < 0) return res.status(404).json({ error: 'Presente não encontrado.' });
+
+  gifts[idx] = {
+    ...gifts[idx],
+    cat,
+    emoji: emoji || '🎁',
+    nome: String(nome).trim(),
+    desc: String(desc || '').trim(),
+    valor: parseFloat(valor),
+    fav: fav === true || fav === 'true'
+  };
   saveGifts(gifts);
   res.json({ ok: true });
 });
