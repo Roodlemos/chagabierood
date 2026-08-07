@@ -450,6 +450,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
         Presenças (RSVP)
       </button>
+      <button class="nav-item" id="btn-tab-recados" style="width:100%;text-align:left;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        Mural de Recados
+      </button>
 
       <div class="nav-label" style="margin-top:1.25rem;">Site</div>
       <a class="nav-item" href="/" target="_blank">
@@ -661,6 +665,35 @@
       </div>
       <!-- ================= /VIEW CONVIDADOS ================= -->
 
+      <!-- ================= VIEW RECADOS ================= -->
+      <div id="view-recados" style="display:none;">
+        <div class="table-section">
+          <div class="table-header">
+            <div>
+              <h3>Mural de Recados</h3>
+              <p id="table-count-messages">Carregando…</p>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Mensagem</th>
+                  <th>Cor</th>
+                  <th>Data</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="table-body-messages">
+                <tr><td colspan="5"><div class="empty-state"><span>Carregando dados…</span></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- ================= /VIEW RECADOS ================= -->
+
     </div><!-- /content -->
   </div><!-- /main -->
 
@@ -723,6 +756,7 @@
     let allPurchases  = [];
     let allGuests     = [];
     let allItems      = [];
+    let allMessages   = [];
     let currentView   = 'presentes';
     let filterStatus  = 'todos';
     let searchQuery   = '';
@@ -764,11 +798,38 @@
           if (res.status === 401 || res.status === 302) return window.location.href = '/admin/login';
           allItems = await res.json();
           renderTableItems();
+        } else if (currentView === 'recados') {
+          const res = await fetch('/admin/api/messages');
+          if (res.status === 401 || res.status === 302) return window.location.href = '/admin/login';
+          allMessages = await res.json();
+          renderTableMessages();
         }
       } catch (e) {
         console.error(e);
         toast('Erro ao carregar dados.');
       }
+    };
+
+    const renderTableMessages = () => {
+      const el = document.getElementById('table-count-messages');
+      if (el) el.textContent = `${allMessages.length} mensagens`;
+      const tbody = document.getElementById('table-body-messages');
+      if (!tbody) return;
+      if (allMessages.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><span>Nenhuma mensagem recebida ainda.</span></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = allMessages.map(m => `
+        <tr data-id="${m.id}">
+          <td style="font-weight:600;color:var(--sage-900);">${escHtml(m.nome)}</td>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">"${escHtml(m.mensagem)}"</td>
+          <td><span class="badge" style="background:var(--n100);">${escHtml(m.color || 'amarelo')}</span></td>
+          <td class="td-date">${fmtDate(m.createdAt)}</td>
+          <td class="td-actions">
+            <button class="btn-action delete" data-id="${m.id}" data-action="delete-message">🗑</button>
+          </td>
+        </tr>
+      `).join('');
     };
 
     // ── Stats ──────────────────────────────────────────────
@@ -1058,6 +1119,18 @@
       }
     });
 
+    const tbMessages = document.getElementById('table-body-messages');
+    if (tbMessages) {
+      tbMessages.addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-action="delete-message"]');
+        if (!btn) return;
+        if (!confirm('Remover esta mensagem?')) return;
+        const res = await fetch(`/admin/api/messages/${btn.dataset.id}`, { method: 'DELETE' });
+        if (res.ok) { allMessages = allMessages.filter(m => m.id !== btn.dataset.id); renderTableMessages(); toast('Mensagem removida.'); }
+        else toast('Erro ao remover.');
+      });
+    }
+
     // ── Filtros de status ──────────────────────────────────
     document.querySelectorAll('.filter-tab').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1119,6 +1192,10 @@
 
     document.getElementById('btn-tab-convidados').addEventListener('click', () => {
       setTab('btn-tab-convidados', 'view-convidados', 'Lista de Presença', 'Gerencie as confirmações de presença do evento');
+    });
+
+    document.getElementById('btn-tab-recados').addEventListener('click', () => {
+      setTab('btn-tab-recados', 'view-recados', 'Mural de Recados', 'Gerencie as mensagens deixadas pelos convidados');
     });
 
     document.getElementById('btn-refresh').addEventListener('click', loadData);

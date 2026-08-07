@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=Dancing+Script:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&family=Dancing+Script:wght@500;600;700&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap"
     rel="stylesheet" />
 
   <style>
@@ -579,13 +579,13 @@
 
       <!-- Subtítulo / Tagline -->
       <p
-        style="font-family:'Inter',sans-serif;font-size:clamp(1rem,3vw,1.2rem);font-weight:300;color:rgba(255,255,255,0.85);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1rem;">
+        style="font-family:'Montserrat',sans-serif;font-size:clamp(0.85rem,2.5vw,1rem);font-weight:400;color:rgba(255,255,255,0.8);letter-spacing:0.35em;text-transform:uppercase;margin-bottom:0.5rem;">
         Chá de Panela
       </p>
 
       <!-- Casal — Título Principal -->
       <h1 class="text-gold-anim"
-        style="font-family:'Dancing Script',cursive;font-size:clamp(4rem,14vw,7.5rem);font-weight:700;margin-bottom:1.5rem;line-height:1.1;text-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+        style="font-family:'Playfair Display',serif;font-size:clamp(2.5rem,8vw,4.5rem);font-weight:600;margin-bottom:1.5rem;line-height:1.2;text-shadow: 0 4px 15px rgba(0,0,0,0.2);">
         Gabriela &amp; Rodolfo
       </h1>
 
@@ -854,28 +854,28 @@
       </div>
 
       <!-- Post-its Grid -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:2rem;padding-bottom:2rem;">
+      <div id="messages-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:2rem;padding-bottom:2rem;">
         
-        <div class="post-it">
-          "Que a casa nova de vocês seja sempre cheia de amor e luz. Parabéns pelo grande passo!"<br><br>
-          <span style="font-size:1rem;color:var(--n500);">- Tia Ana</span>
-        </div>
-        
-        <div class="post-it pink">
-          "Casal lindo! Que Deus abençoe essa nova etapa. Mal posso esperar pelo casamento!"<br><br>
-          <span style="font-size:1rem;color:var(--n500);">- Marcos & Julia</span>
-        </div>
-        
-        <div class="post-it blue">
-          "Felicidades mil! Vocês merecem o mundo. Estaremos sempre aqui por vocês."<br><br>
-          <span style="font-size:1rem;color:var(--n500);">- João Paulo</span>
-        </div>
-        
-        <div class="post-it green">
-          "Acompanhar a história de vocês é maravilhoso. Amo vocês, meus afilhados lindos!"<br><br>
-          <span style="font-size:1rem;color:var(--n500);">- Madrinha Sônia</span>
+        <!-- Formulário (Post-it de Destaque) -->
+        <div class="post-it" style="background:#fff;border:2px dashed var(--n300);box-shadow:none;display:flex;flex-direction:column;justify-content:center;">
+          <form id="form-message" novalidate style="display:flex;flex-direction:column;gap:.75rem;height:100%;">
+            <input type="text" id="msg-nome" placeholder="Seu nome" required style="font-family:'Montserrat',sans-serif;font-size:1rem;padding:.5rem;border:none;border-bottom:1px solid var(--n200);background:transparent;outline:none;" />
+            <textarea id="msg-texto" placeholder="Deixe sua mensagem..." required rows="4" style="font-family:'Dancing Script',cursive;font-size:1.2rem;padding:.5rem;border:none;background:transparent;outline:none;resize:none;flex:1;"></textarea>
+            
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <select id="msg-cor" style="font-family:'Montserrat',sans-serif;font-size:.8rem;padding:.3rem;border:1px solid var(--n200);border-radius:4px;background:#fafafa;cursor:pointer;">
+                <option value="">Amarelo</option>
+                <option value="pink">Rosa</option>
+                <option value="blue">Azul</option>
+                <option value="green">Verde</option>
+              </select>
+              <button type="submit" style="font-family:'Montserrat',sans-serif;font-size:.8rem;font-weight:600;padding:.4rem .8rem;background:var(--s800);color:#fff;border:none;border-radius:4px;cursor:pointer;transition:background .2s;">Enviar</button>
+            </div>
+            <p id="msg-erro" style="color:#b91c1c;font-size:.75rem;display:none;font-family:'Inter',sans-serif;margin:0;"></p>
+          </form>
         </div>
 
+        <!-- Mensagens dinâmicas entrarão aqui -->
       </div>
 
     </div>
@@ -1294,6 +1294,63 @@
           }
         });
       }
+      // --- RECADOS / MENSAGENS ---
+      const messagesGrid = $('messages-grid');
+      const loadMessages = async () => {
+        try {
+          const res = await fetch('/api/messages');
+          const data = await res.json();
+          // Remove todos exceto o form (primeiro filho)
+          while(messagesGrid.children.length > 1) {
+            messagesGrid.removeChild(messagesGrid.lastChild);
+          }
+          data.forEach(msg => {
+            const div = document.createElement('div');
+            div.className = `post-it ${msg.color || ''}`;
+            div.innerHTML = `
+              "${msg.mensagem}"<br><br>
+              <span style="font-size:1rem;color:var(--n500);">- ${msg.nome}</span>
+            `;
+            messagesGrid.appendChild(div);
+          });
+        } catch (e) { console.error('Erro ao buscar mensagens', e); }
+      };
+
+      const formMsg = $('form-message');
+      if (formMsg) {
+        formMsg.addEventListener('submit', async e => {
+          e.preventDefault();
+          $('msg-erro').style.display = 'none';
+          const btn = formMsg.querySelector('button[type="submit"]');
+          const nome = $('msg-nome').value.trim();
+          const texto = $('msg-texto').value.trim();
+          const cor = $('msg-cor').value;
+
+          if (!nome || !texto) return setErr('msg-erro', 'Preencha os campos obrigatórios.');
+
+          setBtn(btn, true);
+          try {
+            const res = await fetch('/api/messages', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nome, mensagem: texto, color: cor })
+            });
+            setBtn(btn, false);
+            if (!res.ok) throw new Error('Erro ao enviar recado.');
+            
+            formMsg.reset();
+            feedback('sucesso', 'Recado Enviado!', 'Muito obrigado pelo carinho.');
+            loadMessages(); // Atualiza o grid
+          } catch(err) {
+            setBtn(btn, false);
+            setErr('msg-erro', err.message);
+          }
+        });
+      }
+      
+      // Carrega os recados iniciais
+      loadMessages();
+
     })();
   </script>
 </body>

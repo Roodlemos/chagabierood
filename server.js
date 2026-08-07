@@ -77,6 +77,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS gifts (id TEXT PRIMARY KEY, cat TEXT, emoji TEXT, nome TEXT, desc TEXT, valor REAL, fav INTEGER);
   CREATE TABLE IF NOT EXISTS guests (id TEXT PRIMARY KEY, name TEXT, companions TEXT, guestsCount INTEGER, createdAt TEXT);
   CREATE TABLE IF NOT EXISTS purchases (id TEXT PRIMARY KEY, payerName TEXT, giftId TEXT, giftName TEXT, valor REAL, pixCode TEXT, status TEXT, createdAt TEXT);
+  CREATE TABLE IF NOT EXISTS messages (id TEXT PRIMARY KEY, nome TEXT, mensagem TEXT, color TEXT, createdAt TEXT);
 `);
 
 const DEFAULT_GIFTS = [
@@ -90,6 +91,7 @@ const migrateFromJSON = () => {
   const GIFTS_FILE = path.join(DATA_DIR, 'gifts.json');
   const GUESTS_FILE = path.join(DATA_DIR, 'guests.json');
   const DATA_FILE = path.join(DATA_DIR, 'purchases.json');
+  const MESSAGES_FILE = path.join(DATA_DIR, 'messages.json');
 
   if (fs.existsSync(GIFTS_FILE)) {
     try {
@@ -229,6 +231,16 @@ const saveGifts = (list) => {
   db.transaction((items) => {
     db.prepare('DELETE FROM gifts').run();
     for (const item of items) insert.run(item.id, item.cat, item.emoji || '🎁', item.nome, item.desc || '', parseFloat(item.valor) || 0, item.fav ? 1 : 0);
+  })(list);
+  notifyAdmin();
+};
+
+const loadMessages = () => db.prepare('SELECT * FROM messages').all();
+const saveMessages = (list) => {
+  const insert = db.prepare('INSERT INTO messages (id, nome, mensagem, color, createdAt) VALUES (?, ?, ?, ?, ?)');
+  db.transaction((items) => {
+    db.prepare('DELETE FROM messages').run();
+    for (const item of items) insert.run(item.id, item.nome, item.mensagem, item.color, item.createdAt);
   })(list);
   notifyAdmin();
 };
@@ -433,6 +445,35 @@ app.post('/api/rsvp', apiLimiter, [
   res.json({ ok: true, message: 'Confirmação enviada com sucesso!' });
 });
 
+// ── GET & POST /api/messages ──────────────────────────────────
+app.get('/api/messages', (req, res) => {
+  res.json(loadMessages());
+});
+
+app.post('/api/messages', apiLimiter, [
+  body('nome').trim().escape().notEmpty().withMessage("Nome é obrigatório."),
+  body('mensagem').trim().escape().notEmpty().withMessage("Mensagem é obrigatória.")
+], (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ error: errors.array()[0].msg });
+  }
+
+  const { nome, mensagem, color } = req.body;
+  const messages = loadMessages();
+  
+  messages.push({
+    id: `msg-${Date.now()}`,
+    nome: String(nome),
+    mensagem: String(mensagem).substring(0, 500),
+    color: color || '', 
+    createdAt: new Date().toISOString()
+  });
+
+  saveMessages(messages);
+  res.json({ ok: true });
+});
+
 // ================================================================
 // ROTAS ADMIN (protegidas por sessão)
 // ================================================================
@@ -622,6 +663,19 @@ app.delete('/admin/api/gifts/:id', requireAdmin, (req, res) => {
   const gifts = loadGifts();
   const filtered = gifts.filter(g => g.id !== req.params.id);
   saveGifts(filtered);
+  res.json({ ok: true });
+});
+
+// GET /admin/api/messages — lista de mensagens (recados)
+app.get('/admin/api/messages', requireAdmin, (req, res) => {
+  res.json(loadMessages());
+});
+
+// DELETE /admin/api/messages/:id — remove uma mensagem
+app.delete('/admin/api/messages/:id', requireAdmin, (req, res) => {
+  const messages = loadMessages();
+  const filtered = messages.filter(m => m.id !== req.params.id);
+  saveMessages(filtered);
   res.json({ ok: true });
 });
 
